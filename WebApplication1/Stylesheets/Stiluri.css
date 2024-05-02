@@ -60,6 +60,11 @@ span {
         text-decoration: underline;
     }
 
+.TextButon {
+    font-size: 18px;
+    padding: 5px;
+}
+
 .selectorStyle {
     height: fit-content;
     margin-top: 20px;
@@ -80,3 +85,15 @@ span {
 input[type="checkbox"] {
     width: 20px;
 }
+
+.butonStyle {
+    padding: 5px;
+    border: 2px solid #ffb300;
+    border-radius: 10px;
+    margin-left: 15%;
+    background-color: #00087f;
+}
+
+    .butonStyle:hover {
+        background-color: #0312e8;
+    }

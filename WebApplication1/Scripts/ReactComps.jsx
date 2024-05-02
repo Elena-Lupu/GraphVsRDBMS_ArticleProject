@@ -15,7 +15,21 @@ class DropDown extends React.Component {
         return (
             <div style={{ width: this.props.width, display: "flex" }}>
                 <Text marime="TextSelect" text={this.props.text} />
-                <select className="selectorStyle">{this.props.data.map((item) => { return (<option value={item.id}>{item.nume}</option>); })}</select>
+                <select className="selectorStyle" defaultValue='0'>
+                    {this.props.data[0].groupName == null
+                        ? this.props.data.map((item) => { return (<option value={item.id}>{item.nume}</option>); })
+                        : this.props.data.map((item) => {
+                            return (
+                                <>
+                                <option value="0" disabled hidden>...</option>
+                                <optgroup label={item.groupName}>
+                                    {item.points.map((item2) => { return (<option value={item2.id}>{item2.nume}</option>); })};
+                                </optgroup>
+                                </>
+                            );
+                        })
+                    };
+                </select>
             </div>
         );
     }
@@ -40,6 +54,20 @@ class CheckBox extends React.Component {
     }
 }
 
+class ButonCalcul extends React.Component {
+    cauta() {
+        alert("functioneeeeeez!");
+    }
+
+    render() {
+        return (
+            <button className="butonStyle" onClick={() => this.cauta() }>
+                <Text text="Calculeaza Traseul" marime="TextButon" />
+            </button>
+        );
+    }
+}
+
 class Meniu extends React.Component {
     render() {
         return (
@@ -58,8 +86,11 @@ class SideBar extends React.Component {
         return (
             <div className="BarStyle SideBarStyle">
                 <Text text="Configurarea traseului" marime="TextSubtitlu"/>
-                <DropDown text="Punct plecare" width="90%" data={JSONdata.etajData} />
-                <DropDown text="Punct destinatie" width="90%" data={JSONdata.etajData} />
+                <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} />
+                <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} />
+                <ButonCalcul />
+                <br />
+                <br />
                 <Text text="Filtre" marime="TextSubtitlu" />
                 <CheckBox text="UnFiltru_1"/>
                 <CheckBox text="UnFiltru_2"/>
