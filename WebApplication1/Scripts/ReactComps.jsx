@@ -15,7 +15,7 @@ class DropDown extends React.Component {
         return (
             <div style={{ width: this.props.width, display: "flex" }}>
                 <Text marime="TextSelect" text={this.props.text} />
-                <select className="selectorStyle" defaultValue='0'>
+                <select className="selectorStyle" defaultValue='0' id={this.props.id}>
                     {this.props.data[0].groupName == null
                         ? this.props.data.map((item) => { return (<option value={item.id}>{item.nume}</option>); })
                         : this.props.data.map((item) => {
@@ -56,7 +56,50 @@ class CheckBox extends React.Component {
 
 class ButonCalcul extends React.Component {
     cauta() {
-        alert("functioneeeeeez!");
+        let bd = document.getElementById("BDuser").value;
+        let punctPlecare = document.getElementById("PunctPlecare").value;
+        let punctDestinatie = document.getElementById("PunctDestinatie").value;
+        let bdController = "";
+        let chestii = [];
+
+        switch (bd) {
+            case '1': bdController = "Neo4j"; break;
+            case '2': bdController = "SQLServer"; break;
+            default: alert("Alege serios !!!");
+        }
+
+        let params = new URLSearchParams();
+        params.append("punctPlecare", punctPlecare);
+        params.append("punctDestinatie", punctDestinatie);
+
+        let options = {
+            method: "POST",
+            body: params
+        };
+
+        /*
+        Format dorit pt fiecare <Text ... />
+           "START:   punctStart"
+           "punct1 ---> punct2"
+           ...
+           "punctn-1 ---> punctn"
+           "FINISH:   punctDestinatie"
+        */
+
+        fetch(webPath + bdController +"/CalculeazaTraseu", options).then(response => response.text())
+            .then(data => {
+                var tempdata = JSON.parse(data);
+                var len = Object.keys(tempdata.Traseu).length;
+
+                chestii.push(<Text text={"START:   " + tempdata.Traseu[0].nume} marime="TextSelect" />);
+                for (var i = 1; i < len; i++)
+                    chestii.push(<Text text={tempdata.Traseu[i-1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
+                chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len-1].nume} marime="TextSelect" />);
+
+                ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
+            })
+            .catch(error => console.log(error));
+
     }
 
     render() {
@@ -75,7 +118,7 @@ class Meniu extends React.Component {
                 <div style={{ width: "15%" }}><Text marime="TextTitlu" text="Precis Way" /></div>
                 <DropDown text="Etaj" width="20%" data={JSONdata.etajData} />
                 <SearchBar />
-                <DropDown text="Baza de date utilizata" width="30%" data={JSONdata.BdData} />
+                <DropDown text="Baza de date utilizata" width="30%" data={JSONdata.BdData} id="BDuser"/>
             </div>
         );
     }
@@ -86,8 +129,8 @@ class SideBar extends React.Component {
         return (
             <div className="BarStyle SideBarStyle">
                 <Text text="Configurarea traseului" marime="TextSubtitlu"/>
-                <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} />
-                <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} />
+                <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} id="PunctPlecare" />
+                <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} id="PunctDestinatie" />
                 <ButonCalcul />
                 <br />
                 <br />
@@ -104,6 +147,7 @@ class DetailBar extends React.Component {
         return (
             <div className="BarStyle DetailBarStyle">
                 <Text text="Detalii traseu" marime="TextSubtitlu" />
+                <div id="detaliiDiv"></div>
             </div>
         );
     }

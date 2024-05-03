@@ -18,5 +18,8 @@
 <footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>
+    <script>
+        var webPath = "@(new UrlHelper(HttpContext.Current.Request.RequestContext).Content("~"))";
+    </script>
     <script type="module" src="@Url.Content("~/Scripts/ReactComps.jsx")"></script>
 </footer>
