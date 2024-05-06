@@ -65,7 +65,20 @@ class ButonCalcul extends React.Component {
         switch (bd) {
             case '1': bdController = "Neo4j"; break;
             case '2': bdController = "SQLServer"; break;
-            default: alert("Alege serios !!!");
+            default: alert("Alege serios !!!"); return;
+        }
+
+        if (punctPlecare == "0") {
+            alert("Alege un punct de plecare !");
+            return;
+        }
+        if (punctDestinatie == "0") {
+            alert("Alege un punct de destinatie !");
+            return;
+        }
+        if (isNaN(punctDestinatie) || isNaN(punctPlecare)) {
+            alert("Alege serios !!!");
+            return;
         }
 
         let params = new URLSearchParams();
@@ -76,15 +89,6 @@ class ButonCalcul extends React.Component {
             method: "POST",
             body: params
         };
-
-        /*
-        Format dorit pt fiecare <Text ... />
-           "START:   punctStart"
-           "punct1 ---> punct2"
-           ...
-           "punctn-1 ---> punctn"
-           "FINISH:   punctDestinatie"
-        */
 
         fetch(webPath + bdController +"/CalculeazaTraseu", options).then(response => response.text())
             .then(data => {
@@ -99,7 +103,6 @@ class ButonCalcul extends React.Component {
                 ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
             })
             .catch(error => console.log(error));
-
     }
 
     render() {
@@ -114,7 +117,7 @@ class ButonCalcul extends React.Component {
 class Meniu extends React.Component {
     render() {
         return (
-            <div className="MeniuStyle">
+            <div className="TopBarStyle MeniuStyle">
                 <div style={{ width: "15%" }}><Text marime="TextTitlu" text="Precis Way" /></div>
                 <DropDown text="Etaj" width="20%" data={JSONdata.etajData} />
                 <SearchBar />
@@ -153,10 +156,26 @@ class DetailBar extends React.Component {
     }
 }
 
+class RunDetailsBar extends React.Component {
+    render() {
+        return (
+            <div className="TopBarStyle RunDetailBarStyle">
+                <Text text="Detalii rulare" marime="TextSubtitlu" />
+                <div id="detaliiRulareDiv"></div>
+            </div>
+        );
+    }
+}
+
 class Pagina extends React.Component {
     render() {
         return (
-            <><SideBar /><DetailBar /><Meniu /></>
+            <>
+                <SideBar />
+                <DetailBar />
+                <RunDetailsBar />
+                <Meniu />
+            </>
         );
     }
 }

@@ -155,8 +155,12 @@ export var pointsData = [
                 "id": "24",
             },
             {
-                "nume": "PR208",
+                "nume": "PR208a",
                 "id": "25",
+            },
+            {
+                "nume": "PR208b",
+                "id": "36",
             }
         ]
     },
@@ -200,8 +204,12 @@ export var pointsData = [
                 "id": "34",
             },
             {
-                "nume": "PR308",
+                "nume": "PR308a",
                 "id": "35",
+            },
+            {
+                "nume": "PR308b",
+                "id": "37",
             }
         ]
     },
@@ -245,8 +253,12 @@ export var pointsData = [
                 "id": "54",
             },
             {
-                "nume": "PR408",
+                "nume": "PR408a",
                 "id": "55",
+            },
+            {
+                "nume": "PR408b",
+                "id": "38",
             }
         ]
     },
@@ -278,20 +290,24 @@ export var pointsData = [
                 "id": "61",
             },
             {
-                "nume": "PR606a",
+                "nume": "PR506a",
                 "id": "62",
             },
             {
-                "nume": "PR606b",
+                "nume": "PR506b",
                 "id": "63",
             },
             {
-                "nume": "PR607",
+                "nume": "PR507",
                 "id": "64",
             },
             {
-                "nume": "PR608",
+                "nume": "PR508a",
                 "id": "65",
+            },
+            {
+                "nume": "PR508b",
+                "id": "39",
             }
         ]
     },
@@ -335,8 +351,12 @@ export var pointsData = [
                 "id": "74",
             },
             {
-                "nume": "PR608",
+                "nume": "PR608a",
                 "id": "75",
+            },
+            {
+                "nume": "PR608b",
+                "id": "40",
             }
         ]
     },
@@ -380,8 +400,12 @@ export var pointsData = [
                 "id": "84",
             },
             {
-                "nume": "PR708",
+                "nume": "PR708a",
                 "id": "85",
+            },
+            {
+                "nume": "PR708b",
+                "id": "41",
             }
         ]
     }
