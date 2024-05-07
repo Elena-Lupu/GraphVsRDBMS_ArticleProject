@@ -47,7 +47,7 @@ class CheckBox extends React.Component {
     render() {
         return (
             <div className="CheckBoxStyle">
-                <input type="checkbox" />
+                <input type="checkbox" id={this.props.id} />
                 <Text marime="TextSelect" text={this.props.text} />
             </div>
         );
@@ -61,6 +61,7 @@ class ButonCalcul extends React.Component {
         let punctDestinatie = document.getElementById("PunctDestinatie").value;
         let bdController = "";
         let chestii = [];
+        let filtruScari = document.getElementById("FiltruScari").checked;
 
         switch (bd) {
             case '1': bdController = "Neo4j"; break;
@@ -84,6 +85,7 @@ class ButonCalcul extends React.Component {
         let params = new URLSearchParams();
         params.append("punctPlecare", punctPlecare);
         params.append("punctDestinatie", punctDestinatie);
+        params.append("filtruScari", filtruScari);
 
         let options = {
             method: "POST",
@@ -138,8 +140,8 @@ class SideBar extends React.Component {
                 <br />
                 <br />
                 <Text text="Filtre" marime="TextSubtitlu" />
-                <CheckBox text="UnFiltru_1"/>
-                <CheckBox text="UnFiltru_2"/>
+                <CheckBox text="Evita Scarile" id="FiltruScari"/>
+                <CheckBox text="Evita ..." id="FiltruPersonalizat"/>
             </div>
         );
     }

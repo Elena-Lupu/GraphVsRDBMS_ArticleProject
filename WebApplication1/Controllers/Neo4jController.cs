@@ -102,9 +102,9 @@ namespace WebApplication1.Controllers
         }
 
         [Obsolete]
-        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie)
+        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari)
         {
-            string traseu = "", idStart = "", idEnd = "";
+            string traseu = "", idStart = "", idEnd = "", harta ="";
 
             try
             {
@@ -117,18 +117,29 @@ namespace WebApplication1.Controllers
                     { "idEnd", idEnd }
                 };
 
+                harta = filtruScari ? "hartaFaraScari" : "hartaCompleta";
+
+                //hartaCompleta este graful complet
+                //hartaFaraScari este graful fara nodurile de tip scari
+                //hartaPersonalizata este graful care exclude nodurile dorite de catre utilizator (poate pleca de la hartaCompleta / hartaFaraScari)
+
                 var ses = neoDriver.AsyncSession();
                 var res = await ses.ExecuteWriteAsync(async tx =>
                 {
                     //Verifica daca este proiectat in memorie o harta corespunzatoare
-                    await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaCompleta\"), " +
-                                        "\"MATCH (n)-[r]->(m) WITH gds.graph.project(" +
-                                            "'hartaCompleta',n,m,{ relationshipProperties: r { .pondere } }) AS grafComplet RETURN 'ok'\")");
+                    if (!filtruScari)
+                        await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaCompleta\"), " +
+                                            "\"MATCH (n)-[r]->(m) WITH gds.graph.project(" +
+                                                "'hartaCompleta',n,m,{ relationshipProperties: r { .pondere } }) AS grafComplet RETURN 'ok'\")");
+                    else
+                        await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaFaraScari\"), " +
+                                            "\"MATCH (n)-[r]->(m) WHERE (NOT n:scari) AND (NOT m:scari) WITH gds.graph.project(" +
+                                                "'hartaFaraScari',n,m,{ relationshipProperties: r { .pondere } }) AS grafFaraScari RETURN 'ok'\")");
 
                     //Calculeaza traseul si ponderea
                     var result = await tx.RunAsync("MATCH (start), (end) " +
                                         "WHERE id(start) = toInteger($idStart) AND id(end) = toInteger($idEnd) " +
-                                        "CALL gds.shortestPath.dijkstra.stream(\"hartaCompleta\", {" +
+                                        "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
                                             "sourceNode: start, targetNode: end, " +
                                             "relationshipWeightProperty: \"pondere\"}) " +
                                         "YIELD totalCost, path " +
