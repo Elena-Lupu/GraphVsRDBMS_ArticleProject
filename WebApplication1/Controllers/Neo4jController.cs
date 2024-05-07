@@ -104,8 +104,7 @@ namespace WebApplication1.Controllers
         [Obsolete]
         public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie)
         {
-            string traseu = "", cypher = "";
-            string idStart = "", idEnd = "";
+            string traseu = "", idStart = "", idEnd = "";
 
             try
             {
@@ -118,17 +117,22 @@ namespace WebApplication1.Controllers
                     { "idEnd", idEnd }
                 };
 
-                cypher = "MATCH (start), (end) WHERE id(start) = toInteger($idStart) AND id(end) = toInteger($idEnd) " +
-                    "CALL gds.shortestPath.dijkstra.stream(\"hartaCompleta\", {" +
-                        "sourceNode: start, targetNode: end, " +
-                        "relationshipWeightProperty: \"pondere\"}) " +
-                    "YIELD totalCost, path " +
-                    "RETURN nodes(path) as path, totalCost";
-
                 var ses = neoDriver.AsyncSession();
                 var res = await ses.ExecuteWriteAsync(async tx =>
                 {
-                    var result = await tx.RunAsync(cypher, para);
+                    //Verifica daca este proiectat in memorie o harta corespunzatoare
+                    await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaCompleta\"), " +
+                                        "\"MATCH (n)-[r]->(m) WITH gds.graph.project(" +
+                                            "'hartaCompleta',n,m,{ relationshipProperties: r { .pondere } }) AS grafComplet RETURN 'ok'\")");
+
+                    //Calculeaza traseul si ponderea
+                    var result = await tx.RunAsync("MATCH (start), (end) " +
+                                        "WHERE id(start) = toInteger($idStart) AND id(end) = toInteger($idEnd) " +
+                                        "CALL gds.shortestPath.dijkstra.stream(\"hartaCompleta\", {" +
+                                            "sourceNode: start, targetNode: end, " +
+                                            "relationshipWeightProperty: \"pondere\"}) " +
+                                        "YIELD totalCost, path " +
+                                        "RETURN nodes(path) as path, totalCost", para);
                     var record = await result.SingleAsync();
 
                     traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
