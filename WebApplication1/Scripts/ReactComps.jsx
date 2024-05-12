@@ -1,6 +1,7 @@
 ﻿import * as JSONdata from "./Constants.js"
+import * as funcsData from "./Funcs.jsx"
 
-class Text extends React.Component {
+export class Text extends React.Component {
     render() {
         return (
             <div className={this.props.marime}>
@@ -10,7 +11,7 @@ class Text extends React.Component {
     }
 }
 
-class DropDown extends React.Component {
+export class DropDown extends React.Component {
     render() {
         return (
             <div style={{ width: this.props.width, display: "flex" }}>
@@ -47,70 +48,18 @@ class CheckBox extends React.Component {
     render() {
         return (
             <div className="CheckBoxStyle">
-                <input type="checkbox" id={this.props.id} />
+                <input type="checkbox" id={this.props.id} onClick={() => this.props.func()} />
                 <Text marime="TextSelect" text={this.props.text} />
             </div>
         );
     }
 }
 
-class ButonCalcul extends React.Component {
-    cauta() {
-        let bd = document.getElementById("BDuser").value;
-        let punctPlecare = document.getElementById("PunctPlecare").value;
-        let punctDestinatie = document.getElementById("PunctDestinatie").value;
-        let bdController = "";
-        let chestii = [];
-        let filtruScari = document.getElementById("FiltruScari").checked;
-
-        switch (bd) {
-            case '1': bdController = "Neo4j"; break;
-            case '2': bdController = "SQLServer"; break;
-            default: alert("Alege serios !!!"); return;
-        }
-
-        if (punctPlecare == "0") {
-            alert("Alege un punct de plecare !");
-            return;
-        }
-        if (punctDestinatie == "0") {
-            alert("Alege un punct de destinatie !");
-            return;
-        }
-        if (isNaN(punctDestinatie) || isNaN(punctPlecare)) {
-            alert("Alege serios !!!");
-            return;
-        }
-
-        let params = new URLSearchParams();
-        params.append("punctPlecare", punctPlecare);
-        params.append("punctDestinatie", punctDestinatie);
-        params.append("filtruScari", filtruScari);
-
-        let options = {
-            method: "POST",
-            body: params
-        };
-
-        fetch(webPath + bdController +"/CalculeazaTraseu", options).then(response => response.text())
-            .then(data => {
-                var tempdata = JSON.parse(data);
-                var len = Object.keys(tempdata.Traseu).length;
-
-                chestii.push(<Text text={"START:   " + tempdata.Traseu[0].nume} marime="TextSelect" />);
-                for (var i = 1; i < len; i++)
-                    chestii.push(<Text text={tempdata.Traseu[i-1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
-                chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len-1].nume} marime="TextSelect" />);
-
-                ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
-            })
-            .catch(error => console.log(error));
-    }
-
+class ButonText extends React.Component {
     render() {
         return (
-            <button className="butonStyle" onClick={() => this.cauta() }>
-                <Text text="Calculeaza Traseul" marime="TextButon" />
+            <button className="butonStyle" onClick={() => this.props.func()}>
+                <Text text={this.props.text} marime="TextButon" />
             </button>
         );
     }
@@ -136,12 +85,13 @@ class SideBar extends React.Component {
                 <Text text="Configurarea traseului" marime="TextSubtitlu"/>
                 <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} id="PunctPlecare" />
                 <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} id="PunctDestinatie" />
-                <ButonCalcul />
+                <ButonText text="Calculeaza Traseul" func={funcsData.cauta} />
                 <br />
                 <br />
                 <Text text="Filtre" marime="TextSubtitlu" />
-                <CheckBox text="Evita Scarile" id="FiltruScari"/>
-                <CheckBox text="Evita ..." id="FiltruPersonalizat"/>
+                <CheckBox text="Evita Scarile" id="FiltruScari" />
+                <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
+                <div id="ListPuncteEvitate"></div>
             </div>
         );
     }

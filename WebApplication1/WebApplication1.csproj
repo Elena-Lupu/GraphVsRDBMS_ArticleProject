@@ -193,6 +193,7 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Scripts\Constants.js" />
+    <Content Include="Scripts\Funcs.jsx" />
     <Content Include="Scripts\ReactComps.jsx" />
     <Content Include="Stylesheets\Stiluri.css" />
     <Content Include="Web.config" />
@@ -202,6 +203,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Neo4jController.cs" />
+    <Compile Include="Controllers\SQLServerController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -222,6 +224,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
     <Folder Include="Views\Neo4j\" />
+    <Folder Include="Views\SQLServer\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
