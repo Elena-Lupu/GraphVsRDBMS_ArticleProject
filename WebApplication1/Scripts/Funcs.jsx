@@ -1,4 +1,4 @@
-﻿import { Text, DropDown } from "./ReactComps.jsx"
+﻿import { Text, ListaDropDowns } from "./ReactComps.jsx"
 import * as JSONdata from "./Constants.js"
 
 export function cauta() {
@@ -54,12 +54,8 @@ export function cauta() {
 }
 
 export function addPuncteEvitare() {
-    if (document.getElementById("FiltruPersonalizat").checked == true) {
-        ReactDOM.render(
-            <DropDown text="1. " width="90%" data={JSONdata.pointsData} id="PunctEvitat-1" />,
-            document.getElementById('ListPuncteEvitate')
-        );
-    }
+    if (document.getElementById("FiltruPersonalizat").checked == true)
+        ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} />, document.getElementById("ListaPuncteEvitate"));
     else
-        ReactDOM.render("", document.getElementById('ListPuncteEvitate'));
+        ReactDOM.render("", document.getElementById("ListaPuncteEvitate"));
 }

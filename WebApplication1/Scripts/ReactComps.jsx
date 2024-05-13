@@ -36,6 +36,34 @@ export class DropDown extends React.Component {
     }
 }
 
+export class ListaDropDowns extends React.Component {
+    state = { nr: 1 };
+
+    add = () => {
+        this.setState({ nr: this.state.nr + 1 });
+    }
+
+    remove = () => {
+        if (this.state.nr > 1)
+            this.setState({ nr: this.state.nr - 1 });
+    }
+
+    render() {
+        let lista = [];
+
+        for (let i = 1; i < this.state.nr + 1; i++)
+            lista.push(<DropDown text={i.toString() + ". "} data={this.props.data} width="73%" />);
+
+        return (
+            <>
+                {lista}
+                <ButonIco svg="plus" func={this.add} />
+                <ButonIco svg="minus" func={this.remove} />
+            </>
+        );
+    }
+}
+
 class SearchBar extends React.Component {
     render() {
         return (
@@ -65,6 +93,16 @@ class ButonText extends React.Component {
     }
 }
 
+export class ButonIco extends React.Component {
+    render() {
+        return (
+            <button className="butonIcoStyle" onClick={() => this.props.func()}>
+                <img src={"../SVG/" + this.props.svg + ".svg"} style={{ width: "20px", height: "20px" }} />
+            </button>
+        );
+    }
+}
+
 class Meniu extends React.Component {
     render() {
         return (
@@ -72,7 +110,7 @@ class Meniu extends React.Component {
                 <div style={{ width: "15%" }}><Text marime="TextTitlu" text="Precis Way" /></div>
                 <DropDown text="Etaj" width="20%" data={JSONdata.etajData} />
                 <SearchBar />
-                <DropDown text="Baza de date utilizata" width="30%" data={JSONdata.BdData} id="BDuser"/>
+                <DropDown text="Baza de date utilizata" width="30%" data={JSONdata.BdData} id="BDuser" />
             </div>
         );
     }
@@ -91,7 +129,7 @@ class SideBar extends React.Component {
                 <Text text="Filtre" marime="TextSubtitlu" />
                 <CheckBox text="Evita Scarile" id="FiltruScari" />
                 <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
-                <div id="ListPuncteEvitate"></div>
+                <div id="ListaPuncteEvitate"></div>
             </div>
         );
     }

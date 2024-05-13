@@ -108,3 +108,10 @@ input[type="checkbox"] {
     .butonStyle:hover {
         background-color: #0312e8;
     }
+
+.butonIcoStyle {
+    border: none;
+    background-color: #00087f;
+    cursor: pointer;
+    padding-left: 20px;
+}

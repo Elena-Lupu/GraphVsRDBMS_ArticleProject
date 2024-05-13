@@ -196,6 +196,7 @@
     <Content Include="Scripts\Funcs.jsx" />
     <Content Include="Scripts\ReactComps.jsx" />
     <Content Include="Stylesheets\Stiluri.css" />
+    <Content Include="SVG\plus.svg" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
