@@ -8,6 +8,7 @@ export function cauta() {
     let bdController = "";
     let chestii = [];
     let filtruScari = document.getElementById("FiltruScari").checked;
+    let puncteEvitate = [];
 
     switch (bd) {
         case '1': bdController = "Neo4j"; break;
@@ -28,10 +29,20 @@ export function cauta() {
         return;
     }
 
+    if (document.getElementById("ListaPuncteEvitate").innerHTML != "") {
+        let i = 1;
+
+        while (document.getElementById("Punct-" + i.toString()) != null) {
+            puncteEvitate.push(document.getElementById("Punct-" + i.toString()).value);
+            i++;
+        }
+    }
+
     let params = new URLSearchParams();
     params.append("punctPlecare", punctPlecare);
     params.append("punctDestinatie", punctDestinatie);
     params.append("filtruScari", filtruScari);
+    params.append("puncteEvitate", puncteEvitate);
 
     let options = {
         method: "POST",

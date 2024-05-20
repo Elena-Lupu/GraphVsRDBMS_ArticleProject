@@ -102,9 +102,9 @@ namespace WebApplication1.Controllers
         }
 
         [Obsolete]
-        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari)
+        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "")
         {
-            string traseu = "", idStart = "", idEnd = "", harta ="";
+            string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "";
 
             try
             {
@@ -117,24 +117,36 @@ namespace WebApplication1.Controllers
                     { "idEnd", idEnd }
                 };
 
-                harta = filtruScari ? "hartaFaraScari" : "hartaCompleta";
+                string[] puncteEvitateList = puncteEvitate.Split(',');
+                int len = puncteEvitateList.Length;
+                for (int i = 0; i < len; i++) puncteEvitateList[i] = neoIdDict[puncteEvitateList[i]];
+
+                harta += filtruScari ? "hartaFaraScari" : "hartaCompleta";
+                harta += puncteEvitate.Replace(",", "o");
 
                 //hartaCompleta este graful complet
                 //hartaFaraScari este graful fara nodurile de tip scari
-                //hartaPersonalizata este graful care exclude nodurile dorite de catre utilizator (poate pleca de la hartaCompleta / hartaFaraScari)
+                //La ambele se poate concatena un sir de nr = punctele ce se doresc evitate
 
                 var ses = neoDriver.AsyncSession();
                 var res = await ses.ExecuteWriteAsync(async tx =>
                 {
                     //Verifica daca este proiectat in memorie o harta corespunzatoare
-                    if (!filtruScari)
-                        await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaCompleta\"), " +
-                                            "\"MATCH (n)-[r]->(m) WITH gds.graph.project(" +
-                                                "'hartaCompleta',n,m,{ relationshipProperties: r { .pondere } }) AS grafComplet RETURN 'ok'\")");
-                    else
-                        await tx.RunAsync("CALL apoc.when(NOT gds.graph.exists(\"hartaFaraScari\"), " +
-                                            "\"MATCH (n)-[r]->(m) WHERE (NOT n:scari) AND (NOT m:scari) WITH gds.graph.project(" +
-                                                "'hartaFaraScari',n,m,{ relationshipProperties: r { .pondere } }) AS grafFaraScari RETURN 'ok'\")");
+                    checkCypher += "CALL apoc.when(NOT gds.graph.exists(\"" + harta + "\"), \"MATCH (n)-[r]->(m) ";
+                    if (filtruScari || puncteEvitate != "") checkCypher += "WHERE ";
+                    if (filtruScari) checkCypher += "(NOT n:scari) AND (NOT m:scari) ";
+                    if (puncteEvitate != "")
+                    {
+                        if (filtruScari) checkCypher += "AND ";
+
+                        checkCypher += "NOT id(n) IN [";
+                        foreach (string pel in puncteEvitateList) checkCypher += "toInteger(" + pel + "), ";
+                        checkCypher = checkCypher.Substring(0, checkCypher.Length - 2);
+                        checkCypher += "] ";
+                    }
+                    checkCypher += "WITH gds.graph.project('" + harta + "', n, m, { relationshipProperties: r { .pondere } }) AS graf" + harta + " RETURN 'ok'\")";
+
+                    await tx.RunAsync(checkCypher);
 
                     //Calculeaza traseul si ponderea
                     var result = await tx.RunAsync("MATCH (start), (end) " +
@@ -146,6 +158,11 @@ namespace WebApplication1.Controllers
                                         "RETURN nodes(path) as path, totalCost", para);
                     var record = await result.SingleAsync();
 
+                    //Daca a fost o harta personalizata trebuie eliminata proiectia din memorie
+                    if (harta != "hartaCompleta" && harta != "hartaFaraScari")
+                        await tx.RunAsync("CALL gds.graph.drop('" + harta + "')");
+
+                    //Formateaza JSON-ul care contine traseul complet + costul + alte detalii
                     traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
                     foreach (var node in record[0].As<List<INode>>())
                         traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";

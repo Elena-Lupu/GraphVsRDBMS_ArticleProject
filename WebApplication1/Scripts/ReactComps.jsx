@@ -40,7 +40,8 @@ export class ListaDropDowns extends React.Component {
     state = { nr: 1 };
 
     add = () => {
-        this.setState({ nr: this.state.nr + 1 });
+        if (this.state.nr < 3)
+            this.setState({ nr: this.state.nr + 1 });
     }
 
     remove = () => {
@@ -52,7 +53,7 @@ export class ListaDropDowns extends React.Component {
         let lista = [];
 
         for (let i = 1; i < this.state.nr + 1; i++)
-            lista.push(<DropDown text={i.toString() + ". "} data={this.props.data} width="73%" />);
+            lista.push(<DropDown text={i.toString() + ". "} data={this.props.data} width="73%" id={"Punct-" + i.toString()} />);
 
         return (
             <>

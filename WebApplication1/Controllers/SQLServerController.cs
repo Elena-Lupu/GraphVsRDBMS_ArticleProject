@@ -109,7 +109,7 @@ namespace WebApplication1.Controllers
             sqlServerDriver.Open();
         }
 
-        public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari)
+        public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate)
         {
             string idStart = "", idEnd = "", traseu = "";
 
