@@ -31,9 +31,12 @@ export function cauta() {
 
     if (document.getElementById("ListaPuncteEvitate").innerHTML != "") {
         let i = 1;
+        let vals = "0";
 
         while (document.getElementById("Punct-" + i.toString()) != null) {
-            puncteEvitate.push(document.getElementById("Punct-" + i.toString()).value);
+            vals = document.getElementById("Punct-" + i.toString()).value;
+            if (vals != punctPlecare && vals != punctDestinatie)
+                puncteEvitate.push(document.getElementById("Punct-" + i.toString()).value);
             i++;
         }
     }
@@ -51,14 +54,16 @@ export function cauta() {
 
     fetch(webPath + bdController + "/CalculeazaTraseu", options).then(response => response.text())
         .then(data => {
-            var tempdata = JSON.parse(data);
-            var len = Object.keys(tempdata.Traseu).length;
+            try {
+                var tempdata = JSON.parse(data);
+                var len = Object.keys(tempdata.Traseu).length;
 
-            chestii.push(<Text text={"START:   " + tempdata.Traseu[0].nume} marime="TextSelect" />);
-            for (var i = 1; i < len; i++)
-                chestii.push(<Text text={tempdata.Traseu[i - 1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
-            chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len - 1].nume} marime="TextSelect" />);
+                chestii.push(<Text text={"START:   " + tempdata.Traseu[0].nume} marime="TextSelect" />);
+                for (var i = 1; i < len; i++)
+                    chestii.push(<Text text={tempdata.Traseu[i - 1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
+                chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len - 1].nume} marime="TextSelect" />);
 
+            } catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
             ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
         })
         .catch(error => console.log(error));

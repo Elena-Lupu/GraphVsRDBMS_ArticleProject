@@ -109,20 +109,30 @@ namespace WebApplication1.Controllers
             sqlServerDriver.Open();
         }
 
-        public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate)
+        public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "")
         {
             string idStart = "", idEnd = "", traseu = "";
+            string[] puncteEvitateList;
 
             try
             {
                 idStart = sqlServerIdDict[punctPlecare];
                 idEnd = sqlServerIdDict[punctDestinatie];
 
+                if (puncteEvitate != "")
+                {
+                    puncteEvitateList = puncteEvitate.Split(',');
+                    int len = puncteEvitateList.Length;
+                    for (int i = 0; i < len; i++) puncteEvitateList[i] = sqlServerIdDict[puncteEvitateList[i]];
+                    puncteEvitate = string.Join(",", puncteEvitateList);
+                }
+
                 Dictionary<string, object> para = new Dictionary<string, object>()
                 {
                     { "StartNode", idStart },
                     { "EndNode", idEnd },
-                    { "FaraScari", filtruScari }
+                    { "FaraScari", filtruScari },
+                    { "puncteEvitate", puncteEvitate }
                 };
 
                 using (SqlCommand cmd = new SqlCommand("dbo.CalculeazaTraseu", sqlServerDriver))
@@ -141,9 +151,10 @@ namespace WebApplication1.Controllers
                         string[] pathNames = reader.GetString(2).Split(',');
                         for (int i = 0; i < pathIds.Length; i++)
                             traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + pathIds[i] + "},";
+                        traseu = traseu.Substring(0, traseu.Length - 1);
+                        traseu += "]}";
                     }
-                    traseu = traseu.Substring(0, traseu.Length - 1);
-                    traseu += "]}";
+                    else traseu = "0";
 
                     reader.Close();
                 }

@@ -105,6 +105,7 @@ namespace WebApplication1.Controllers
         public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "")
         {
             string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "";
+            string[] puncteEvitateList = { };
 
             try
             {
@@ -117,9 +118,12 @@ namespace WebApplication1.Controllers
                     { "idEnd", idEnd }
                 };
 
-                string[] puncteEvitateList = puncteEvitate.Split(',');
-                int len = puncteEvitateList.Length;
-                for (int i = 0; i < len; i++) puncteEvitateList[i] = neoIdDict[puncteEvitateList[i]];
+                if (puncteEvitate != "")
+                {
+                    puncteEvitateList = puncteEvitate.Split(',');
+                    int len = puncteEvitateList.Length;
+                    for (int i = 0; i < len; i++) puncteEvitateList[i] = neoIdDict[puncteEvitateList[i]];
+                }
 
                 harta += filtruScari ? "hartaFaraScari" : "hartaCompleta";
                 harta += puncteEvitate.Replace(",", "o");
