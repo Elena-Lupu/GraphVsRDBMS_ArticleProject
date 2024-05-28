@@ -102,10 +102,11 @@ namespace WebApplication1.Controllers
         }
 
         [Obsolete]
-        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "")
+        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "";
-            string[] puncteEvitateList = { };
+            string[] puncteEvitateList = { }, puncteIntermediareList = { };
+            int lenVia = 0;
 
             try
             {
@@ -121,8 +122,15 @@ namespace WebApplication1.Controllers
                 if (puncteEvitate != "")
                 {
                     puncteEvitateList = puncteEvitate.Split(',');
-                    int len = puncteEvitateList.Length;
-                    for (int i = 0; i < len; i++) puncteEvitateList[i] = neoIdDict[puncteEvitateList[i]];
+                    int lenAnti = puncteEvitateList.Length;
+                    for (int i = 0; i < lenAnti; i++) puncteEvitateList[i] = neoIdDict[puncteEvitateList[i]];
+                }
+
+                if (puncteIntermediare != "")
+                {
+                    puncteIntermediareList = puncteIntermediare.Split(',');
+                    lenVia = puncteIntermediareList.Length;
+                    for (int i = 0; i < lenVia; i++) puncteIntermediareList[i] = neoIdDict[puncteIntermediareList[i]];
                 }
 
                 harta += filtruScari ? "hartaFaraScari" : "hartaCompleta";
@@ -152,26 +160,96 @@ namespace WebApplication1.Controllers
 
                     await tx.RunAsync(checkCypher);
 
-                    //Calculeaza traseul si ponderea
-                    var result = await tx.RunAsync("MATCH (start), (end) " +
-                                        "WHERE id(start) = toInteger($idStart) AND id(end) = toInteger($idEnd) " +
-                                        "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
-                                            "sourceNode: start, targetNode: end, " +
-                                            "relationshipWeightProperty: \"pondere\"}) " +
-                                        "YIELD totalCost, path " +
-                                        "RETURN nodes(path) as path, totalCost", para);
-                    var record = await result.SingleAsync();
+                    //Calculeaza traseul si ponderea (fara puncte intermediare)
+                    if (puncteIntermediare == "")
+                    {
+                        //Calcul traseu
+                        var result = await tx.RunAsync("MATCH (start), (end) " +
+                                            "WHERE id(start) = toInteger($idStart) AND id(end) = toInteger($idEnd) " +
+                                            "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
+                                                "sourceNode: start, targetNode: end, " +
+                                                "relationshipWeightProperty: \"pondere\"}) " +
+                                            "YIELD totalCost, path " +
+                                            "RETURN nodes(path) as path, totalCost", para);
+                        var record = await result.SingleAsync();
+
+                        //Formateaza JSON-ul care contine traseul complet + costul + alte detalii
+                        traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
+                        foreach (var node in record[0].As<List<INode>>())
+                            traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                        traseu = traseu.Substring(0, traseu.Length - 1);
+                        traseu += "]}";
+                    }
+                    else
+                    {
+                        int costTraseuVia = 999, costTemp;
+                        string traseuTemp = "{\"Traseu\": [";
+
+                        for (int i = 0; i < lenVia; i++)
+                        {
+                            costTemp = 0;
+
+                            //Calcul traseu Start - puncteIntermediareList - End
+                            var result = await tx.RunAsync("MATCH (start), (end) " +
+                                            "WHERE id(start) = toInteger($idStart) AND id(end) = toInteger(" + puncteIntermediareList[0] + ") " +
+                                            "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
+                                                "sourceNode: start, targetNode: end, " +
+                                                "relationshipWeightProperty: \"pondere\"}) " +
+                                            "YIELD totalCost, path " +
+                                            "RETURN nodes(path) as path, totalCost", para);
+                            var record = await result.SingleAsync();
+                            costTemp += record[1].As<int>();
+                            foreach (var node in record[0].As<List<INode>>())
+                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+
+                            for (int j = 0; j < lenVia - 1; j++)
+                            {
+                                result = await tx.RunAsync("MATCH (start), (end) " +
+                                            "WHERE id(start) = toInteger(" + puncteIntermediareList[j] + ") AND id(end) = toInteger(" + puncteIntermediareList[j+1] + ") " +
+                                            "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
+                                                "sourceNode: start, targetNode: end, " +
+                                                "relationshipWeightProperty: \"pondere\"}) " +
+                                            "YIELD totalCost, path " +
+                                            "RETURN nodes(path) as path, totalCost", para);
+                                record = await result.SingleAsync();
+                                costTemp += record[1].As<int>();
+                                foreach (var node in record[0].As<List<INode>>())
+                                    traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                            }
+
+                            result = await tx.RunAsync("MATCH (start), (end) " +
+                                                    "WHERE id(start) = toInteger(" + puncteIntermediareList[lenVia - 1] + ") AND id(end) = toInteger($idEnd) " +
+                                                    "CALL gds.shortestPath.dijkstra.stream(\"" + harta + "\", {" +
+                                                        "sourceNode: start, targetNode: end, " +
+                                                        "relationshipWeightProperty: \"pondere\"}) " +
+                                                    "YIELD totalCost, path " +
+                                                    "RETURN nodes(path) as path, totalCost", para);
+                            record = await result.SingleAsync();
+                            costTemp += record[1].As<int>();
+                            foreach (var node in record[0].As<List<INode>>())
+                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+
+                            traseuTemp = traseuTemp.Substring(0, traseuTemp.Length - 1);
+                            traseuTemp += "], \"Pondere\": " + costTemp.ToString() + "}";
+
+                            //Compara costul total al traseului cu ultimul salvat si retine traseul JSON + costul daca este mai mic
+                            if (costTemp < costTraseuVia)
+                            {
+                                costTraseuVia = costTemp;
+                                traseu = traseuTemp;
+                            }
+
+                            //Permuta puncteIntermediareList --> Primul element devine ultimul
+                            traseuTemp = puncteIntermediareList[0];
+                            for (int j = 0; j < lenVia - 1; j++)
+                                puncteIntermediareList[j] = puncteIntermediareList[j + 1];
+                            puncteIntermediareList[lenVia - 1] = traseuTemp;
+                        }
+                    }
 
                     //Daca a fost o harta personalizata trebuie eliminata proiectia din memorie
                     if (harta != "hartaCompleta" && harta != "hartaFaraScari")
                         await tx.RunAsync("CALL gds.graph.drop('" + harta + "')");
-
-                    //Formateaza JSON-ul care contine traseul complet + costul + alte detalii
-                    traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
-                    foreach (var node in record[0].As<List<INode>>())
-                        traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
-                    traseu = traseu.Substring(0, traseu.Length - 1);
-                    traseu += "]}";
 
                     return traseu;
                 });

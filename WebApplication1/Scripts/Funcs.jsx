@@ -1,4 +1,4 @@
-﻿import { Text, ListaDropDowns } from "./ReactComps.jsx"
+﻿import { Text, ListaDropDowns, ButonIco } from "./ReactComps.jsx"
 import * as JSONdata from "./Constants.js"
 
 export function cauta() {
@@ -9,6 +9,7 @@ export function cauta() {
     let chestii = [];
     let filtruScari = document.getElementById("FiltruScari").checked;
     let puncteEvitate = [];
+    let puncteIntermediare = [];
 
     switch (bd) {
         case '1': bdController = "Neo4j"; break;
@@ -30,13 +31,25 @@ export function cauta() {
     }
 
     if (document.getElementById("ListaPuncteEvitate").innerHTML != "") {
-        let i = 1;
-        let vals = "0";
+        var i = 1;
+        var vals = "0";
 
-        while (document.getElementById("Punct-" + i.toString()) != null) {
-            vals = document.getElementById("Punct-" + i.toString()).value;
+        while (document.getElementById("Punct-Evitate" + i.toString()) != null) {
+            vals = document.getElementById("Punct-Evitate" + i.toString()).value;
             if (vals != punctPlecare && vals != punctDestinatie)
-                puncteEvitate.push(document.getElementById("Punct-" + i.toString()).value);
+                puncteEvitate.push(vals);
+            i++;
+        }
+    }
+
+    if (document.getElementById("plusPuncteIntermediare").innerHTML != "") {
+        var i = 1;
+        var vals = "0";
+
+        while (document.getElementById("Punct-Intermediare" + i.toString()) != null) {
+            vals = document.getElementById("Punct-Intermediare" + i.toString()).value;
+            if (vals != punctPlecare && vals != punctDestinatie)
+                puncteIntermediare.push(vals);
             i++;
         }
     }
@@ -46,6 +59,7 @@ export function cauta() {
     params.append("punctDestinatie", punctDestinatie);
     params.append("filtruScari", filtruScari);
     params.append("puncteEvitate", puncteEvitate);
+    params.append("puncteIntermediare", puncteIntermediare);
 
     let options = {
         method: "POST",
@@ -71,7 +85,22 @@ export function cauta() {
 
 export function addPuncteEvitare() {
     if (document.getElementById("FiltruPersonalizat").checked == true)
-        ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} />, document.getElementById("ListaPuncteEvitate"));
+        ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} addId="Evitate" />, document.getElementById("ListaPuncteEvitate"));
     else
         ReactDOM.render("", document.getElementById("ListaPuncteEvitate"));
+}
+
+export function adaugaPuncteIntermediare() {
+    document.getElementById("plusPuncteIntermediare").style.display = "";
+    ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} onZeroFunc={replaceInitialText} addId="Intermediare" />, document.getElementById("plusPuncteIntermediare"));
+}
+
+function replaceInitialText() {
+    document.getElementById("plusPuncteIntermediare").style.display = "flex";
+    ReactDOM.render(
+        <>
+            <ButonIco svg="plus" func={adaugaPuncteIntermediare} />
+            <Text text="Adauga puncte intermediare" />
+        </>, document.getElementById("plusPuncteIntermediare")
+    );
 }

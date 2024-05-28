@@ -45,21 +45,31 @@ export class ListaDropDowns extends React.Component {
     }
 
     remove = () => {
-        if (this.state.nr > 1)
-            this.setState({ nr: this.state.nr - 1 });
+        if (this.state.nr > 0)
+            this.setState(
+                { nr: this.state.nr - 1 },
+                () => {
+                    if (this.state.nr == 0) this.props.onZeroFunc()
+                }
+            );
     }
 
     render() {
         let lista = [];
 
         for (let i = 1; i < this.state.nr + 1; i++)
-            lista.push(<DropDown text={i.toString() + ". "} data={this.props.data} width="73%" id={"Punct-" + i.toString()} />);
+            lista.push(<DropDown text={i.toString() + ". "} data={this.props.data} width="73%" id={"Punct-" + this.props.addId + i.toString()} />);
 
         return (
             <>
                 {lista}
-                <ButonIco svg="plus" func={this.add} />
-                <ButonIco svg="minus" func={this.remove} />
+                {lista.length > 0 && (
+                        <>
+                            <ButonIco svg="plus" func={this.add} />
+                            <ButonIco svg="minus" func={this.remove} />
+                        </>
+                    )
+                }
             </>
         );
     }
@@ -123,6 +133,10 @@ class SideBar extends React.Component {
             <div className="BarStyle SideBarStyle">
                 <Text text="Configurarea traseului" marime="TextSubtitlu"/>
                 <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} id="PunctPlecare" />
+                <div style={{ display: "flex" }} id="plusPuncteIntermediare">
+                    <ButonIco svg="plus" func={funcsData.adaugaPuncteIntermediare} />
+                    <Text text="Adauga puncte intermediare" />
+                </div>
                 <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} id="PunctDestinatie" />
                 <ButonText text="Calculeaza Traseul" func={funcsData.cauta} />
                 <br />
