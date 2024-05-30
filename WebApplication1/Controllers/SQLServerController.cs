@@ -112,7 +112,8 @@ namespace WebApplication1.Controllers
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string idStart = "", idEnd = "", traseu = "";
-            string[] puncteEvitateList;
+            string[] puncteEvitateList, puncteIntermediareList;
+            int lenVia;
 
             try
             {
@@ -127,12 +128,21 @@ namespace WebApplication1.Controllers
                     puncteEvitate = string.Join(",", puncteEvitateList);
                 }
 
+                if (puncteIntermediare != "")
+                {
+                    puncteIntermediareList = puncteIntermediare.Split(',');
+                    lenVia = puncteIntermediareList.Length;
+                    for (int i = 0; i < lenVia; i++) puncteIntermediareList[i] = sqlServerIdDict[puncteIntermediareList[i]];
+                    puncteIntermediare = string.Join(",", puncteIntermediareList);
+                }
+
                 Dictionary<string, object> para = new Dictionary<string, object>()
                 {
                     { "StartNode", idStart },
                     { "EndNode", idEnd },
                     { "FaraScari", filtruScari },
-                    { "puncteEvitate", puncteEvitate }
+                    { "puncteEvitate", puncteEvitate },
+                    { "puncteIntermediare", puncteIntermediare}
                 };
 
                 using (SqlCommand cmd = new SqlCommand("dbo.CalculeazaTraseu", sqlServerDriver))

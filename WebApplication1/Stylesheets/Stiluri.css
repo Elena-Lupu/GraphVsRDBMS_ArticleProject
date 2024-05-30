@@ -1,14 +1,20 @@
-﻿body {
+﻿:root {
+    --fundalPanel: #000660;
+    --conturContrast: #ac7900;
+    --font: Palatino, URW Palladio L, serif;
+}
+
+body {
     background-color: #000c3d;
     margin: 0;
 }
 
 .TopBarStyle {
-    background-color: #00087f;
+    background-color: var(--fundalPanel);
     width: 100%;
     position: absolute;
-    border-right: 2px solid #ffb300;
-    border-left: 2px solid #ffb300;
+    border-right: 2px solid var(--conturContrast);
+    border-left: 2px solid var(--conturContrast);
     display: flex;
 }
 
@@ -16,37 +22,38 @@
     height: 8%;
     border-radius: 0px 0px 25px 25px;
     box-shadow: 0px 5px 18px 0px #000000;
-    border-bottom: 2px solid #ffb300;
+    border-bottom: 2px solid var(--conturContrast);
 }
 
 .RunDetailBarStyle {
     bottom: 0px;
-    border-top: 2px solid rgb(255, 179, 0);
+    border-top: 2px solid var(--conturContrast);
     border-radius: 25px 25px 0px 0px;
     overflow: scroll;
     height: 15%;
 }
 
 .BarStyle {
-    background-color: #00087f;
-    height: 100%;
+    background-color: var(--fundalPanel);
+    height: 77%;
     width: 15%;
     padding-top: 4%;
     position: absolute;
+    overflow: scroll;
 }
 
 .SideBarStyle {
-    border-right: 2px solid #ffb300;
+    border-right: 2px solid var(--conturContrast);
 }
 
 .DetailBarStyle {
-    border-left: 2px solid #ffb300;
+    border-left: 2px solid var(--conturContrast);
     right: 0;
 }
 
 span {
     color: white;
-    font-family: URW Chancery L, cursive;
+    font-family: var(--font);
 }
     
 .TextTitlu {
@@ -79,10 +86,10 @@ span {
 .selectorStyle {
     height: fit-content;
     margin-top: 20px;
-    border: 2px solid #ffb300;
+    border: 2px solid var(--conturContrast);
     border-radius: 10px;
     width: 150px;
-    font-family: URW Chancery L, cursive;
+    font-family: var(--font);
     box-shadow: inset 0 0 10px #feb362;
     padding-left: 15px;
     font-size: 16px;
@@ -99,10 +106,10 @@ input[type="checkbox"] {
 
 .butonStyle {
     padding: 5px;
-    border: 2px solid #ffb300;
+    border: 2px solid var(--conturContrast);
     border-radius: 10px;
     margin-left: 15%;
-    background-color: #00087f;
+    background-color: var(--fundalPanel);
 }
 
     .butonStyle:hover {
@@ -111,7 +118,7 @@ input[type="checkbox"] {
 
 .butonIcoStyle {
     border: none;
-    background-color: #00087f;
+    background-color: var(--fundalPanel);
     cursor: pointer;
     padding-left: 20px;
 }

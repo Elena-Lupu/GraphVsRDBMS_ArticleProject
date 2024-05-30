@@ -74,7 +74,8 @@ export function cauta() {
 
                 chestii.push(<Text text={"START:   " + tempdata.Traseu[0].nume} marime="TextSelect" />);
                 for (var i = 1; i < len; i++)
-                    chestii.push(<Text text={tempdata.Traseu[i - 1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
+                    if (tempdata.Traseu[i - 1].nume != tempdata.Traseu[i].nume)
+                        chestii.push(<Text text={tempdata.Traseu[i - 1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
                 chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len - 1].nume} marime="TextSelect" />);
 
             } catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
@@ -85,7 +86,7 @@ export function cauta() {
 
 export function addPuncteEvitare() {
     if (document.getElementById("FiltruPersonalizat").checked == true)
-        ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} addId="Evitate" />, document.getElementById("ListaPuncteEvitate"));
+        ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} addId="Evitate" onZeroFunc={debif} />, document.getElementById("ListaPuncteEvitate"));
     else
         ReactDOM.render("", document.getElementById("ListaPuncteEvitate"));
 }
@@ -103,4 +104,8 @@ function replaceInitialText() {
             <Text text="Adauga puncte intermediare" />
         </>, document.getElementById("plusPuncteIntermediare")
     );
+}
+
+function debif() {
+    document.getElementById("FiltruPersonalizat").checked = false;
 }
