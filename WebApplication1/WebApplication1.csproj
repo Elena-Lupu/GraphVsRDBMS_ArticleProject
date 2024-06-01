@@ -224,6 +224,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Pics\" />
     <Folder Include="Views\Neo4j\" />
     <Folder Include="Views\SQLServer\" />
   </ItemGroup>

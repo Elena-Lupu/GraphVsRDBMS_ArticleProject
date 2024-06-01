@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<svg width="448" height="512" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc. -->
+ <defs>
+  <symbol id="svg_2" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+   <!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc. -->
+   <path d="m135.2,17.7l-7.2,14.3l-96,0c-17.7,0 -32,14.3 -32,32s14.3,32 32,32l384,0c17.7,0 32,-14.3 32,-32s-14.3,-32 -32,-32l-96,0l-7.2,-14.3c-5.4,-10.9 -16.5,-17.7 -28.6,-17.7l-120.4,0c-12.1,0 -23.2,6.8 -28.6,17.7zm280.8,110.3l-384,0l21.2,339c1.6,25.3 22.6,45 47.9,45l245.8,0c25.3,0 46.3,-19.7 47.9,-45l21.2,-339z"/>
+  </symbol>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <use fill="#ffffff" id="svg_3" transform="matrix(0.992094, 0, 0, 0.995742, 1.60425, 3.22765)" x="0" xlink:href="#svg_2" y="-2.63"/>
+ </g>
+</svg>

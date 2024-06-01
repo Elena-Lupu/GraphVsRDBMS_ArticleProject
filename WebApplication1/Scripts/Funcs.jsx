@@ -1,6 +1,50 @@
 ﻿import { Text, ListaDropDowns, ButonIco } from "./ReactComps.jsx"
 import * as JSONdata from "./Constants.js"
 
+let harta = null;
+let ctx = null;
+let img = null;
+
+window.onload = function () {
+    harta = document.getElementById("canvasCentral");
+    ctx = harta.getContext('2d');
+    img = new Image();
+
+    img.src = "../Pics/OmuletulToamnei.JPG";
+    img.onload = function () {
+        harta.width = img.width;
+        harta.height = img.height;
+        ctx.drawImage(img, 0, 0, harta.width, harta.height);
+    }
+
+    //Doar pt a extrage coordonatele punctelor de pe harta --> Comenteaza dupa !!!
+    function getMousePos(harta, event) {
+        const rect = harta.getBoundingClientRect();
+        return {
+            x: (event.clientX - rect.left) * (harta.width / rect.width),
+            y: (event.clientY - rect.top) * (harta.height / rect.height)
+        };
+    }
+
+    harta.addEventListener('click', function (event) {
+        const pos = getMousePos(harta, event);
+        console.log(`Mouse position: ${pos.x}, ${pos.y}`);
+    });
+}
+
+/*
+export function testButon() {
+    ctx.beginPath();
+    ctx.arc(1981, 688, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = 'blue';
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#003300';
+    ctx.stroke();
+}
+*/
+
+
 export function cauta() {
     let bd = document.getElementById("BDuser").value;
     let punctPlecare = document.getElementById("PunctPlecare").value;
@@ -94,6 +138,11 @@ export function addPuncteEvitare() {
 export function adaugaPuncteIntermediare() {
     document.getElementById("plusPuncteIntermediare").style.display = "";
     ReactDOM.render(<ListaDropDowns data={JSONdata.pointsData} onZeroFunc={replaceInitialText} addId="Intermediare" />, document.getElementById("plusPuncteIntermediare"));
+}
+
+export function clearTraseu() {
+    ctx.clearRect(0, 0, harta.width, harta.height);
+    ctx.drawImage(img, 0, 0, harta.width, harta.height);
 }
 
 function replaceInitialText() {

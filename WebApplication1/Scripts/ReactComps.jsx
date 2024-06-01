@@ -145,6 +145,7 @@ class SideBar extends React.Component {
                 <CheckBox text="Evita Scarile" id="FiltruScari" />
                 <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
                 <div id="ListaPuncteEvitate"></div>
+                {/*<ButonText text="Teste" func={funcsData.testButon} />*/}
             </div>
         );
     }
@@ -154,7 +155,10 @@ class DetailBar extends React.Component {
     render() {
         return (
             <div className="BarStyle DetailBarStyle">
-                <Text text="Detalii traseu" marime="TextSubtitlu" />
+                <div style={{ display: "flex" }}>
+                    <Text text="Detalii traseu" marime="TextSubtitlu" />
+                    <div style={{ padding: "15px" }}><ButonIco svg="trash" func={funcsData.clearTraseu} /></div>
+                </div>
                 <div id="detaliiDiv"></div>
             </div>
         );
@@ -176,6 +180,7 @@ class Pagina extends React.Component {
     render() {
         return (
             <>
+                <canvas id="canvasCentral" style={{ width: "100%", height: "100%", position: "absolute" }}></canvas>
                 <SideBar />
                 <DetailBar />
                 <RunDetailsBar />
