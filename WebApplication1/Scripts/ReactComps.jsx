@@ -119,7 +119,11 @@ class Meniu extends React.Component {
         return (
             <div className="TopBarStyle MeniuStyle">
                 <div style={{ width: "15%" }}><Text marime="TextTitlu" text="Precis Way" /></div>
-                <DropDown text="Etaj" width="20%" data={JSONdata.etajData} />
+                <DropDown text="Etaj" width="12%" data={JSONdata.etajData} />
+                <div style={{ display: "flex", width: "15%" }}>
+                    <ButonIco svg="zoomIn" func={funcsData.zoomInHarta} />
+                    <ButonIco svg="zoomOut" func={funcsData.zoomOutHarta} />
+                </div>
                 <SearchBar />
                 <DropDown text="Baza de date utilizata" width="30%" data={JSONdata.BdData} id="BDuser" />
             </div>
@@ -145,7 +149,7 @@ class SideBar extends React.Component {
                 <CheckBox text="Evita Scarile" id="FiltruScari" />
                 <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
                 <div id="ListaPuncteEvitate"></div>
-                {/*<ButonText text="Teste" func={funcsData.testButon} />*/}
+                <ButonText text="Teste" func={funcsData.testButon} />
             </div>
         );
     }
@@ -176,11 +180,21 @@ class RunDetailsBar extends React.Component {
     }
 }
 
+class PozaCentrala extends React.Component {
+    render() {
+        return (
+            <div id="canvasDiv" className="canvasStyle">
+                <canvas id="canvasCentral" className="canvasStyle"></canvas>
+            </div>
+        );
+    }
+}
+
 class Pagina extends React.Component {
     render() {
         return (
             <>
-                <canvas id="canvasCentral" style={{ width: "100%", height: "100%", position: "absolute" }}></canvas>
+                <PozaCentrala />
                 <SideBar />
                 <DetailBar />
                 <RunDetailsBar />
