@@ -16,7 +16,7 @@ export class DropDown extends React.Component {
         return (
             <div style={{ width: this.props.width, display: "flex" }}>
                 <Text marime="TextSelect" text={this.props.text} />
-                <select className="selectorStyle" defaultValue='0' id={this.props.id}>
+                <select className="selectorStyle" defaultValue='0' id={this.props.id} onChange={() => this.props.func()}>
                     {this.props.data[0].groupName == null
                         ? this.props.data.map((item) => { return (<option value={item.id}>{item.nume}</option>); })
                         : this.props.data.map((item) => {
@@ -119,7 +119,7 @@ class Meniu extends React.Component {
         return (
             <div className="TopBarStyle MeniuStyle">
                 <div style={{ width: "15%" }}><Text marime="TextTitlu" text="Precis Way" /></div>
-                <DropDown text="Etaj" width="12%" data={JSONdata.etajData} />
+                <DropDown text="Etaj" width="12%" data={JSONdata.etajData} id="SelectEtaj" func={funcsData.schimbaHarta} />
                 <div style={{ display: "flex", width: "15%" }}>
                     <ButonIco svg="zoomIn" func={funcsData.zoomInHarta} />
                     <ButonIco svg="zoomOut" func={funcsData.zoomOutHarta} />

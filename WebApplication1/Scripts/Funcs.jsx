@@ -10,7 +10,7 @@ window.onload = function () {
     ctx = harta.getContext('2d');
     img = new Image();
 
-    img.src = "../Pics/Etaj_1_MappedIn.png";
+    img.src = "../Pics/Parter_MappedIn.png";
     img.onload = function () {
         harta.width = img.width;
         harta.height = img.height;
@@ -68,7 +68,7 @@ window.onload = function () {
 
 export function testButon() {
     ctx.beginPath();
-    ctx.arc(1981, 688, 10, 0, 2 * Math.PI);
+    ctx.arc(257, 434, 10, 0, 2 * Math.PI);
     ctx.fillStyle = 'blue';
     ctx.fill();
     ctx.lineWidth = 1;
@@ -187,6 +187,29 @@ export function zoomOutHarta() {
     let ceva = document.getElementById("canvasDiv");
     ceva.style.width = (parseFloat(getComputedStyle(ceva).width) - 50) + 'px';
     ceva.style.height = (parseFloat(getComputedStyle(ceva).height) - 50) + 'px';
+}
+
+export function schimbaHarta() {
+    let pozaHarta = "";
+    let hartaId = document.getElementById("SelectEtaj").value;
+
+    switch (hartaId) {
+        case "8": pozaHarta = "Parter"; break;
+        case "1": pozaHarta = "Etaj_1"; break;
+        case "2": pozaHarta = "Etaj_2"; break;
+        case "3": pozaHarta = "Etaj_3"; break;
+        case "4": pozaHarta = "Etaj_4"; break;
+        case "5": pozaHarta = "Etaj_5"; break;
+        case "6": pozaHarta = "Etaj_6"; break;
+        case "7": pozaHarta = "Etaj_7"; break;
+    }
+
+    img.src = "../Pics/" + pozaHarta + "_MappedIn.png";
+    img.onload = function () {
+        harta.width = img.width;
+        harta.height = img.height;
+        ctx.drawImage(img, 0, 0, harta.width, harta.height);
+    }
 }
 
 function replaceInitialText() {
