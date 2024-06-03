@@ -10,7 +10,7 @@ window.onload = function () {
     ctx = harta.getContext('2d');
     img = new Image();
 
-    img.src = "../Pics/OmuletulToamnei.JPG";
+    img.src = "../Pics/Etaj_1_MappedIn.png";
     img.onload = function () {
         harta.width = img.width;
         harta.height = img.height;
