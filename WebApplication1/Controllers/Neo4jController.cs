@@ -12,7 +12,7 @@ namespace WebApplication1.Controllers
 {
     public class Neo4jController : Controller, IDisposable
     {
-        private readonly ILogger loggyNeo4j;
+        private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4j;
         private readonly IDriver neoDriver;
         private readonly Dictionary<string, string> neoIdDict = new Dictionary<string, string>() // Key = LocalID, Value = NeoID
         {
