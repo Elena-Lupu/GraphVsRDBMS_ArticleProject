@@ -2,16 +2,21 @@
 using Neo4j.Driver;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebApplication1.Models;
 using ZLogger;
 
 namespace WebApplication1.Controllers
 {
     public class Neo4jController : Controller, IDisposable
     {
+        CommonMethods cm = null;
+        private readonly Stopwatch sw = null;
         private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4j;
         private readonly IDriver neoDriver;
         private readonly Dictionary<string, string> neoIdDict = new Dictionary<string, string>() // Key = LocalID, Value = NeoID
@@ -110,6 +115,8 @@ namespace WebApplication1.Controllers
             });
 
             loggyNeo4j = factory.CreateLogger("Neo4j_Logs");
+            sw = new Stopwatch();
+            cm = new CommonMethods("Neo4j Desktop");
         }
 
         [Obsolete]
@@ -118,6 +125,7 @@ namespace WebApplication1.Controllers
             string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "";
             string[] puncteEvitateList = { }, puncteIntermediareList = { };
             int lenVia = 0;
+            float virtualMem;
 
             try
             {
@@ -154,6 +162,9 @@ namespace WebApplication1.Controllers
                 var ses = neoDriver.AsyncSession();
                 var res = await ses.ExecuteWriteAsync(async tx =>
                 {
+                    virtualMem = cm.getTotalMemoryUsage();
+                    sw.Start();
+
                     //Verifica daca este proiectat in memorie o harta corespunzatoare
                     checkCypher += "CALL apoc.when(NOT gds.graph.exists(\"" + harta + "\"), \"MATCH (n)-[r]->(m) ";
                     if (filtruScari || puncteEvitate != "") checkCypher += "WHERE ";
@@ -262,11 +273,18 @@ namespace WebApplication1.Controllers
                     if (harta != "hartaCompleta" && harta != "hartaFaraScari")
                         await tx.RunAsync("CALL gds.graph.drop('" + harta + "')");
 
+                    sw.Stop();
+
+                    Thread.Sleep(2000);
+                    virtualMem = Math.Abs(cm.getTotalMemoryUsage() - virtualMem);
+
                     loggyNeo4j.LogInformation(
-                            "{" +
-                                "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\"" +
-                            "}"
-                        );
+                        "{ " +
+                            "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                            "\"TimpExecutie-ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
+                            "\"MemorieUtilizata-Bytes\": \"" + virtualMem.ToString() + "\" " +
+                        "},"
+                    );
 
                     return traseu;
                 });
