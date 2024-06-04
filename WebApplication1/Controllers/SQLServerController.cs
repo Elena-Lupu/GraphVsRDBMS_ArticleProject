@@ -117,7 +117,7 @@ namespace WebApplication1.Controllers
             var factory = LoggerFactory.Create(logging =>
             {
                 logging.SetMinimumLevel(LogLevel.Trace);
-                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Zuzu.log");
+                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
             });
 
             loggySQL = factory.CreateLogger("SQL_Logs");
@@ -177,13 +177,18 @@ namespace WebApplication1.Controllers
                             traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + pathIds[i] + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
                         traseu += "]}";
+
+                        loggySQL.LogInformation(
+                            "{" +
+                                "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\"" +
+                            "}"
+                        );
                     }
                     else traseu = "0";
 
                     reader.Close();
                 }
 
-                loggySQL.LogInformation("Aloooooo");
             } catch (Exception ex)
             {
                 Console.WriteLine(ex);

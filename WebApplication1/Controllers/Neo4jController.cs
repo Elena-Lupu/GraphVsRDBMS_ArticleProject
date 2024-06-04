@@ -1,15 +1,18 @@
-﻿using Neo4j.Driver;
+﻿using Microsoft.Extensions.Logging;
+using Neo4j.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using ZLogger;
 
 namespace WebApplication1.Controllers
 {
     public class Neo4jController : Controller, IDisposable
     {
+        private readonly ILogger loggyNeo4j;
         private readonly IDriver neoDriver;
         private readonly Dictionary<string, string> neoIdDict = new Dictionary<string, string>() // Key = LocalID, Value = NeoID
         {
@@ -99,6 +102,14 @@ namespace WebApplication1.Controllers
         public Neo4jController()
         {
             neoDriver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "GrafuriVesele"));
+
+            var factory = LoggerFactory.Create(logging =>
+            {
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
+            });
+
+            loggyNeo4j = factory.CreateLogger("Neo4j_Logs");
         }
 
         [Obsolete]
@@ -250,6 +261,12 @@ namespace WebApplication1.Controllers
                     //Daca a fost o harta personalizata trebuie eliminata proiectia din memorie
                     if (harta != "hartaCompleta" && harta != "hartaFaraScari")
                         await tx.RunAsync("CALL gds.graph.drop('" + harta + "')");
+
+                    loggyNeo4j.LogInformation(
+                            "{" +
+                                "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\"" +
+                            "}"
+                        );
 
                     return traseu;
                 });
