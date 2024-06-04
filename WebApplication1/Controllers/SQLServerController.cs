@@ -1,16 +1,22 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using static Microsoft.ClearScript.V8.V8CpuProfile;
+using ZLogger;
+using ZLogger.Providers;
+using Microsoft.Extensions.Logging;
 
 namespace WebApplication1.Controllers
 {
     public class SQLServerController : Controller, IDisposable
     {
+        private readonly ILogger loggySQL;
         private readonly SqlConnection sqlServerDriver = null;
         private readonly Dictionary<string, string> sqlServerIdDict = new Dictionary<string, string>() // Key = LocalID, Value = sqlServerID
         {
@@ -107,6 +113,14 @@ namespace WebApplication1.Controllers
 
             sqlServerDriver = new SqlConnection(sb.ConnectionString);
             sqlServerDriver.Open();
+
+            var factory = LoggerFactory.Create(logging =>
+            {
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Zuzu.log");
+            });
+
+            loggySQL = factory.CreateLogger("SQL_Logs");
         }
 
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
@@ -168,6 +182,8 @@ namespace WebApplication1.Controllers
 
                     reader.Close();
                 }
+
+                loggySQL.LogInformation("Aloooooo");
             } catch (Exception ex)
             {
                 Console.WriteLine(ex);
