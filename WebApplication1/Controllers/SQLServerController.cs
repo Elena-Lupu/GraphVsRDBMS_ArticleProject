@@ -11,11 +11,14 @@ using static Microsoft.ClearScript.V8.V8CpuProfile;
 using ZLogger;
 using ZLogger.Providers;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Threading;
 
 namespace WebApplication1.Controllers
 {
     public class SQLServerController : Controller, IDisposable
     {
+        private readonly Stopwatch sw = null;
         private readonly ILogger loggySQL;
         private readonly SqlConnection sqlServerDriver = null;
         private readonly Dictionary<string, string> sqlServerIdDict = new Dictionary<string, string>() // Key = LocalID, Value = sqlServerID
@@ -121,13 +124,16 @@ namespace WebApplication1.Controllers
             });
 
             loggySQL = factory.CreateLogger("SQL_Logs");
+            sw = new Stopwatch();
         }
 
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
-            string idStart = "", idEnd = "", traseu = "";
+            string idStart = "", idEnd = "", traseu = "", dateRulare = "";
             string[] puncteEvitateList, puncteIntermediareList;
             int lenVia;
+            float ram = 0;
+            PerformanceCounter cpu;
 
             try
             {
@@ -166,7 +172,9 @@ namespace WebApplication1.Controllers
                     foreach (KeyValuePair<string, object> k in para)
                         cmd.Parameters.AddWithValue(k.Key, k.Value);
 
+                    sw.Start();
                     SqlDataReader reader = cmd.ExecuteReader();
+                    sw.Stop();
 
                     if (reader.Read())
                     {
@@ -176,13 +184,21 @@ namespace WebApplication1.Controllers
                         for (int i = 0; i < pathIds.Length; i++)
                             traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + pathIds[i] + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
-                        traseu += "]}";
 
-                        loggySQL.LogInformation(
-                            "{" +
-                                "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\"" +
-                            "}"
-                        );
+                        ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
+                        cpu = new PerformanceCounter("Process", "% Processor Time", "Neo4j Desktop");
+                        cpu.NextValue();
+                        Thread.Sleep(1000);
+
+                        dateRulare = "{ " +
+                            "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                            "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
+                            "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
+                            "\"CPU\": \"" + (cpu.NextValue() / Environment.ProcessorCount).ToString() + "\" " +
+                        "}";
+                        traseu += "], \"DateRulare\": " + dateRulare + " }";
+
+                        loggySQL.LogInformation(dateRulare + ", ");
                     }
                     else traseu = "0";
 

@@ -4,18 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using WebApplication1.Models;
 using ZLogger;
 
 namespace WebApplication1.Controllers
 {
     public class Neo4jController : Controller, IDisposable
     {
-        CommonMethods cm = null;
         private readonly Stopwatch sw = null;
         private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4j;
         private readonly IDriver neoDriver;
@@ -116,16 +115,16 @@ namespace WebApplication1.Controllers
 
             loggyNeo4j = factory.CreateLogger("Neo4j_Logs");
             sw = new Stopwatch();
-            cm = new CommonMethods("Neo4j Desktop");
         }
 
         [Obsolete]
         public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
-            string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "";
+            string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "", dateRulare = "";
             string[] puncteEvitateList = { }, puncteIntermediareList = { };
             int lenVia = 0;
-            float virtualMem;
+            float ram = 0;
+            PerformanceCounter cpu;
 
             try
             {
@@ -162,7 +161,6 @@ namespace WebApplication1.Controllers
                 var ses = neoDriver.AsyncSession();
                 var res = await ses.ExecuteWriteAsync(async tx =>
                 {
-                    virtualMem = cm.getTotalMemoryUsage();
                     sw.Start();
 
                     //Verifica daca este proiectat in memorie o harta corespunzatoare
@@ -200,7 +198,7 @@ namespace WebApplication1.Controllers
                         foreach (var node in record[0].As<List<INode>>())
                             traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
-                        traseu += "]}";
+                        traseu += "], ";
                     }
                     else
                     {
@@ -252,7 +250,7 @@ namespace WebApplication1.Controllers
                                 traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
 
                             traseuTemp = traseuTemp.Substring(0, traseuTemp.Length - 1);
-                            traseuTemp += "], \"Pondere\": " + costTemp.ToString() + "}";
+                            traseuTemp += "], \"Pondere\": " + costTemp.ToString() + ", ";
 
                             //Compara costul total al traseului cu ultimul salvat si retine traseul JSON + costul daca este mai mic
                             if (costTemp < costTraseuVia)
@@ -275,16 +273,21 @@ namespace WebApplication1.Controllers
 
                     sw.Stop();
 
-                    Thread.Sleep(2000);
-                    virtualMem = Math.Abs(cm.getTotalMemoryUsage() - virtualMem);
+                    ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
+                    cpu = new PerformanceCounter("Process", "% Processor Time", "Neo4j Desktop");
+                    cpu.NextValue();
+                    Thread.Sleep(1000);
 
-                    loggyNeo4j.LogInformation(
-                        "{ " +
-                            "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
-                            "\"TimpExecutie-ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
-                            "\"MemorieUtilizata-Bytes\": \"" + virtualMem.ToString() + "\" " +
-                        "},"
-                    );
+                    dateRulare = "{ " +
+                        "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                        "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
+                        "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
+                        "\"CPU\": \"" + (cpu.NextValue() / Environment.ProcessorCount).ToString() + "\" " +
+                    "}";
+
+                    traseu += "\"DateRulare\": " + dateRulare + "}";
+
+                    loggyNeo4j.LogInformation(dateRulare);
 
                     return traseu;
                 });

@@ -82,6 +82,7 @@ export function cauta() {
     let punctDestinatie = document.getElementById("PunctDestinatie").value;
     let bdController = "";
     let chestii = [];
+    let detaliiRulare = [];
     let filtruScari = document.getElementById("FiltruScari").checked;
     let puncteEvitate = [];
     let puncteIntermediare = [];
@@ -153,8 +154,15 @@ export function cauta() {
                         chestii.push(<Text text={tempdata.Traseu[i - 1].nume + " ---> " + tempdata.Traseu[i].nume} marime="TextSelect" />);
                 chestii.push(<Text text={"FINISH:   " + tempdata.Traseu[len - 1].nume} marime="TextSelect" />);
 
+                detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Timestamp:  " + tempdata.DateRulare.DateTime} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Timp de calcul:  " + tempdata.DateRulare.TimpExecutie_ms + " ms"} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + tempdata.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> CPU:  " + tempdata.DateRulare.CPU + " %"} marime="TextSelect" />);
+
             } catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
             ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
+            ReactDOM.render(detaliiRulare, document.getElementById('detaliiRulareDiv'));
         })
         .catch(error => console.log(error));
 }

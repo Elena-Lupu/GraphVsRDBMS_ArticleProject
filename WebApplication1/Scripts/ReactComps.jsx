@@ -149,7 +149,7 @@ class SideBar extends React.Component {
                 <CheckBox text="Evita Scarile" id="FiltruScari" />
                 <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
                 <div id="ListaPuncteEvitate"></div>
-                <ButonText text="Teste" func={funcsData.testButon} />
+                {/*<ButonText text="Teste" func={funcsData.testButon} />*/}
             </div>
         );
     }

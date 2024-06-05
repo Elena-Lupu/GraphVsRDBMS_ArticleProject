@@ -13,6 +13,7 @@ namespace WebApplication1.Models
     public class CommonMethods
     {
         public string db { get; set; }
+        public Process[] procs { get; set; }
 
         public CommonMethods(string dbName)
         {
@@ -22,12 +23,28 @@ namespace WebApplication1.Models
         public float getTotalMemoryUsage()
         {
             float totalMemoryUsage = 0;
-            Process[] procs = Process.GetProcessesByName(db);
+            procs = Process.GetProcessesByName(db);
 
             foreach (Process proc in procs)
                 totalMemoryUsage += proc.WorkingSet64;
 
-            return totalMemoryUsage;
+            return totalMemoryUsage / (1024 * 1024);
+        }
+
+        public TimeSpan getCpuTime()
+        {
+            TimeSpan cpuTime = TimeSpan.Zero;
+            procs = Process.GetProcessesByName(db);
+
+            foreach (Process proc in procs)
+                cpuTime += proc.TotalProcessorTime;
+
+            return cpuTime;
+        }
+
+        public string getTotalCpu(double cpuDif, double timeDif)
+        {
+            return (cpuDif / timeDif * 100.0 / Environment.ProcessorCount).ToString();
         }
     }
 }
