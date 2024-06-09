@@ -124,7 +124,7 @@ namespace WebApplication1.Controllers
             string[] puncteEvitateList = { }, puncteIntermediareList = { };
             int lenVia = 0;
             float ram = 0;
-            PerformanceCounter cpu;
+            double cpu;
 
             try
             {
@@ -273,16 +273,24 @@ namespace WebApplication1.Controllers
 
                     sw.Stop();
 
+                    //Calcul memorie
                     ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
-                    cpu = new PerformanceCounter("Process", "% Processor Time", "Neo4j Desktop");
-                    cpu.NextValue();
-                    Thread.Sleep(1000);
+
+                    //Calcul CPU
+                    PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
+                    double timpTotal = 0.0;
+                    Process[] proceseleInteres = Process.GetProcessesByName("Neo4j Desktop");
+                    cpuIdlePC.NextValue();
+                    foreach (Process proc in proceseleInteres)
+                        timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
+                    Thread.Sleep(1500);
+                    cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue() / timpTotal;
 
                     dateRulare = "{ " +
                         "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
                         "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
                         "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
-                        "\"CPU\": \"" + (cpu.NextValue() / Environment.ProcessorCount).ToString() + "\" " +
+                        "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
                     "}";
 
                     traseu += "\"DateRulare\": " + dateRulare + "}";

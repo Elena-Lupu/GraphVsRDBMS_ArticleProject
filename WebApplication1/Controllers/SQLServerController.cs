@@ -134,7 +134,7 @@ namespace WebApplication1.Controllers
             string[] puncteEvitateList, puncteIntermediareList;
             int lenVia;
             float ram;
-            double cpu = 0;
+            double cpu;
 
             try
             {
