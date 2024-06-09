@@ -158,7 +158,7 @@ export function cauta() {
                 detaliiRulare.push(<Text text={"--> Timestamp:  " + tempdata.DateRulare.DateTime} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timp de calcul:  " + tempdata.DateRulare.TimpExecutie_ms + " ms"} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + tempdata.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
-                detaliiRulare.push(<Text text={"--> CPU:  " + tempdata.DateRulare.CPU + " %"} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> CPU:  " + tempdata.DateRulare.CPU_Pr + " %"} marime="TextSelect" />);
 
             } catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
             ReactDOM.render(chestii, document.getElementById('detaliiDiv'));

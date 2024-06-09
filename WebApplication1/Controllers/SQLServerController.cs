@@ -13,13 +13,14 @@ using ZLogger.Providers;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading;
+using Neo4j.Driver;
 
 namespace WebApplication1.Controllers
 {
     public class SQLServerController : Controller, IDisposable
     {
         private readonly Stopwatch sw = null;
-        private readonly ILogger loggySQL;
+        private readonly Microsoft.Extensions.Logging.ILogger loggySQL;
         private readonly SqlConnection sqlServerDriver = null;
         private readonly Dictionary<string, string> sqlServerIdDict = new Dictionary<string, string>() // Key = LocalID, Value = sqlServerID
         {
@@ -129,11 +130,11 @@ namespace WebApplication1.Controllers
 
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
-            string idStart = "", idEnd = "", traseu = "", dateRulare = "";
+            string idStart, idEnd, traseu = "", dateRulare;
             string[] puncteEvitateList, puncteIntermediareList;
             int lenVia;
-            float ram = 0;
-            PerformanceCounter cpu;
+            float ram;
+            double cpu = 0;
 
             try
             {
@@ -185,16 +186,24 @@ namespace WebApplication1.Controllers
                             traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + pathIds[i] + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
 
-                        ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
-                        cpu = new PerformanceCounter("Process", "% Processor Time", "Neo4j Desktop");
-                        cpu.NextValue();
-                        Thread.Sleep(1000);
+                        //Calcul memorie
+                        ram = new PerformanceCounter("Process", "Working Set - Private", "sqlservr").NextValue() / (1024 * 1024);
+
+                        //Calcul CPU
+                        PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
+                        double timpTotal = 0.0;
+                        Process[] proceseleInteres = Process.GetProcessesByName("sqlservr");
+                        cpuIdlePC.NextValue();
+                        foreach (Process proc in proceseleInteres)
+                            timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
+                        Thread.Sleep(1500);
+                        cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue() / timpTotal;
 
                         dateRulare = "{ " +
                             "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
                             "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
                             "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
-                            "\"CPU\": \"" + (cpu.NextValue() / Environment.ProcessorCount).ToString() + "\" " +
+                            "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
                         "}";
                         traseu += "], \"DateRulare\": " + dateRulare + " }";
 
