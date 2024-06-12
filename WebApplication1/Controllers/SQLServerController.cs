@@ -137,7 +137,7 @@ namespace WebApplication1.Controllers
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string idStart, idEnd, traseu = "", dateRulare;
-            string[] puncteEvitateList, puncteIntermediareList;
+            string[] puncteEvitateList, puncteIntermediareList = null;
             int lenVia;
             float ram;
             double cpu;
@@ -207,6 +207,7 @@ namespace WebApplication1.Controllers
 
                         dateRulare = "{ " +
                             "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                            "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
                             "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
                             "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
                             "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +

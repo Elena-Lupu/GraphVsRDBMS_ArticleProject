@@ -1,4 +1,4 @@
-﻿import { Text, ListaDropDowns, ButonIco } from "./ReactComps.jsx"
+﻿import { Text, ListaDropDowns, ButonIco, PaginaStats, Pagina } from "./ReactComps.jsx"
 import * as JSONdata from "./Constants.js"
 
 let harta = null;
@@ -13,7 +13,6 @@ window.onload = function () {
     harta = document.getElementById("canvasCentral");
     ctx = harta.getContext('2d');
     img = new Image();
-
     img.src = "../Pics/Parter_MappedIn.png";
     img.onload = function () {
         harta.width = img.width;
@@ -176,6 +175,7 @@ export function cauta() {
 
                 detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timestamp:  " + traseu.DateRulare.DateTime} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Nr de puncte intermediare:  " + traseu.DateRulare.NrPuncteIntermediare} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timp de calcul:  " + traseu.DateRulare.TimpExecutie_ms + " ms"} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + traseu.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> CPU:  " + traseu.DateRulare.CPU_Pr + " %"} marime="TextSelect" />);
@@ -186,6 +186,61 @@ export function cauta() {
             punePunctePeHarta();
         })
         .catch(error => console.log(error));
+}
+
+export function DeschideStatistica() {
+    let jsonVector = null;
+    let xVector = [];
+    let yVector = [];
+    document.body.style.backgroundColor = '#000660';
+
+    fetch(webPath + "Home/GetStats", { method: "POST" }).then(response => response.text())
+        .then(data => {
+            jsonVector = JSON.parse(data);
+            ReactDOM.render(<PaginaStats
+                nrSQL={jsonVector.SQLServer.length}
+                nrNeo={jsonVector.Neo.length}
+                dataSQL={jsonVector.SQLServer}
+                dataNeo={jsonVector.Neo}
+            />, document.getElementById('unDiv'))
+
+            //SQL Server
+            jsonVector.SQLServer.forEach((el) => {
+                xVector.push(el.DateTime);
+                yVector.push(parseInt(el.TimpExecutie_ms));
+            });
+            deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_SQL");
+
+            yVector = [];
+            jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.MemorieUtilizata_MB).replaceAll(',', '.'))));
+            deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_SQL");
+
+            yVector = [];
+            jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.CPU_Pr).replaceAll(',', '.'))));
+            deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_SQL");
+
+            //Neo4j
+            xVector = [];
+            yVector = [];
+            jsonVector.Neo.forEach((el) => {
+                xVector.push(el.DateTime);
+                yVector.push(parseInt(el.TimpExecutie_ms));
+            });
+            deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_Neo");
+
+            yVector = [];
+            jsonVector.Neo.forEach((el) => yVector.push(parseFloat(el.MemorieUtilizata_MB)));
+            deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_Neo");
+
+            yVector = [];
+            jsonVector.Neo.forEach((el) => yVector.push(parseFloat(el.CPU_Pr)));
+            deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_Neo");
+        })
+        .catch(error => console.log(error));
+}
+
+export function intoarcePg() {
+    location.reload();
 }
 
 export function addPuncteEvitare() {
@@ -246,6 +301,16 @@ export function schimbaHarta(etaj = 0) {
         ctx.drawImage(img, 0, 0, harta.width, harta.height);
         punePunctePeHarta();
     }
+}
+
+function deseneazaGrafic(titlu, xVector, yVector, id) {
+    let layout = {
+        width: parseInt(getComputedStyle(document.getElementById(id)).width) * 1.5,
+        height: parseInt(getComputedStyle(document.getElementById(id)).width),
+        title: titlu,
+        xaxis: { 'visible': false }
+    }
+    Plotly.newPlot(id, [{ x: xVector, y: yVector, type: 'scatter' }], layout);
 }
 
 function punePunctePeHarta() {

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc. -->
+
+ <g class="layer">
+  <title>Layer 1</title>
+  <path d="m459.5,440.6c9.5,7.9 22.8,9.7 34.1,4.4s18.4,-16.6 18.4,-29l0,-320c0,-12.4 -7.2,-23.7 -18.4,-29s-24.5,-3.6 -34.1,4.4l-171.5,142.9l0,41.7l0,41.7l171.5,142.9zm-203.5,-88.6l0,-96l0,-128l0,-32c0,-12.4 -7.2,-23.7 -18.4,-29s-24.5,-3.6 -34.1,4.4l-192,160c-7.3,6.1 -11.5,15.1 -11.5,24.6s4.2,18.5 11.5,24.6l192,160c9.5,7.9 22.8,9.7 34.1,4.4s18.4,-16.6 18.4,-29l0,-64z" fill="#ffffff" id="svg_1"/>
+ </g>
+</svg>

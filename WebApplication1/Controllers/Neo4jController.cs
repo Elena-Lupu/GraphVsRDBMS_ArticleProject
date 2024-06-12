@@ -294,6 +294,7 @@ namespace WebApplication1.Controllers
 
                     dateRulare = "{ " +
                         "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                        "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
                         "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
                         "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
                         "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +

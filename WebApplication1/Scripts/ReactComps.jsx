@@ -11,6 +11,41 @@ export class Text extends React.Component {
     }
 }
 
+class Tabel extends React.Component {
+    render() {
+        return (
+            <div className="tableBox">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TimeStamp</th>
+                            <th>Nr. puncte intermediare</th>
+                            <th>Timp executie (ms)</th>
+                            <th>Memorie utilizata (MB)</th>
+                            <th>CPU (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.props.data.map((item) => {
+                                return (
+                                    <tr>
+                                        <td>{item.DateTime}</td>
+                                        <td>{item.NrPuncteIntermediare}</td>
+                                        <td>{item.TimpExecutie_ms}</td>
+                                        <td>{item.MemorieUtilizata_MB}</td>
+                                        <td>{item.CPU_Pr}</td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+}
+
 export class DropDown extends React.Component {
     render() {
         return (
@@ -173,7 +208,11 @@ class RunDetailsBar extends React.Component {
     render() {
         return (
             <div className="TopBarStyle RunDetailBarStyle">
-                <Text text="Detalii rulare" marime="TextSubtitlu" />
+                <div style={{ flexDirection: "column" }}>
+                    <Text text="Detalii rulare" marime="TextSubtitlu" />
+                    <br />
+                    <ButonText text="Statistica" func={funcsData.DeschideStatistica} />
+                </div>
                 <div id="detaliiRulareDiv"></div>
             </div>
         );
@@ -190,7 +229,7 @@ class PozaCentrala extends React.Component {
     }
 }
 
-class Pagina extends React.Component {
+export class Pagina extends React.Component {
     render() {
         return (
             <>
@@ -200,6 +239,38 @@ class Pagina extends React.Component {
                 <RunDetailsBar />
                 <Meniu />
             </>
+        );
+    }
+}
+
+export class PaginaStats extends React.Component {
+    render() {
+        return (
+            <div style={{ padding: "10px", height: "100vh" }}>
+                <ButonIco svg="inapoi" func={funcsData.intoarcePg} />
+                <Text text="Statistici" marime="TextTitlu" />
+
+                <Text text="MS SQL Server" marime="TextSubtitlu" />
+                <Text text={"Astazi au fost procesate cu succes " + this.props.nrSQL + " cereri catre server:"} marime="TextSelect" />
+                <Tabel data={this.props.dataSQL} />
+                <div style={{ display: "flex" }}>
+                    <div id="Plot_Timpi_SQL" style={{ width: "20%", paddingRight: "12%" }}></div>
+                    <div id="Plot_Mem_SQL" style={{ width: "20%", paddingRight: "12%" }}></div>
+                    <div id="Plot_CPU_SQL" style={{ width: "20%", paddingRight: "12%" }}></div>
+                </div>
+
+                <br />
+                <br />
+
+                <Text text="Neo4j" marime="TextSubtitlu" />
+                <Text text={"Astazi au fost procesate cu succes " + this.props.nrNeo + " cereri catre server:"} marime="TextSelect" />
+                <Tabel data={this.props.dataNeo} />
+                <div style={{ display: "flex" }}>
+                    <div id="Plot_Timpi_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
+                    <div id="Plot_Mem_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
+                    <div id="Plot_CPU_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
+                </div>
+            </div>
         );
     }
 }

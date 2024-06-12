@@ -9,6 +9,33 @@ body {
     margin: 0;
 }
 
+td {
+    border-top: 2px solid #6f6f6f;
+    font-size: 16px;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    font-size: 18px;
+    padding: 10px;
+}
+
+table {
+    color: white;
+    border-spacing: 0;
+}
+
+.tableBox {
+    height: 30%;
+    width: fit-content;
+    overflow: scroll;
+    padding: 10px;
+    border: 2px solid #ac7900;
+    border-radius: 2%;
+    margin: 10px;
+}
+
 .TopBarStyle {
     background-color: var(--fundalPanel);
     width: 100%;
@@ -29,7 +56,6 @@ body {
     bottom: 0px;
     border-top: 2px solid var(--conturContrast);
     border-radius: 25px 25px 0px 0px;
-    overflow: scroll;
     height: 15%;
 }
 
@@ -39,7 +65,7 @@ body {
     width: 15%;
     padding-top: 4%;
     position: absolute;
-    overflow: scroll;
+    overflow-x: scroll;
 }
 
 .SideBarStyle {
