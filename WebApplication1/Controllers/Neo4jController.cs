@@ -96,11 +96,17 @@ namespace WebApplication1.Controllers
             { "79", "85" }, //PR703b
             { "80", "59" }, //PR704
             { "81", "60" }, //PR705
-            { "82", "61" }, //PR706a
-            { "83", "84" }, //PR706b
-            { "84", "62" }, //PR707
-            { "85", "63" }, //PR708a
+            { "42", "61" }, //PR706a
+            { "43", "84" }, //PR706b
+            { "44", "62" }, //PR707
+            { "45", "63" }, //PR708a
             { "41", "83" }, //PR708b
+            { "82", "8" }, //Scari_1
+            { "83", "0" }, //Scari_2
+            { "84", "9" }, //Scari_Mici
+            { "85", "10" }, //Lift
+            { "86", "11" }, //Iesire_1
+            { "87", "74" }, //Iesire_2
         };
 
         public Neo4jController()
@@ -196,7 +202,7 @@ namespace WebApplication1.Controllers
                         //Formateaza JSON-ul care contine traseul complet + costul + alte detalii
                         traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
                         foreach (var node in record[0].As<List<INode>>())
-                            traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                            traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
                         traseu += "], ";
                     }
@@ -220,7 +226,7 @@ namespace WebApplication1.Controllers
                             var record = await result.SingleAsync();
                             costTemp += record[1].As<int>();
                             foreach (var node in record[0].As<List<INode>>())
-                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
 
                             for (int j = 0; j < lenVia - 1; j++)
                             {
@@ -234,7 +240,7 @@ namespace WebApplication1.Controllers
                                 record = await result.SingleAsync();
                                 costTemp += record[1].As<int>();
                                 foreach (var node in record[0].As<List<INode>>())
-                                    traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                                    traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
                             }
 
                             result = await tx.RunAsync("MATCH (start), (end) " +
@@ -247,7 +253,7 @@ namespace WebApplication1.Controllers
                             record = await result.SingleAsync();
                             costTemp += record[1].As<int>();
                             foreach (var node in record[0].As<List<INode>>())
-                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + node.Id.ToString() + "},";
+                                traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
 
                             traseuTemp = traseuTemp.Substring(0, traseuTemp.Length - 1);
                             traseuTemp += "], \"Pondere\": " + costTemp.ToString() + ", ";

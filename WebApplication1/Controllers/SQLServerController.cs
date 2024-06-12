@@ -100,11 +100,17 @@ namespace WebApplication1.Controllers
             { "79", "80" }, //PR703b
             { "80", "81" }, //PR704
             { "81", "82" }, //PR705
-            { "82", "83" }, //PR706a
-            { "83", "84" }, //PR706b
-            { "84", "85" }, //PR707
-            { "85", "86" }, //PR708a
+            { "42", "83" }, //PR706a
+            { "43", "84" }, //PR706b
+            { "44", "85" }, //PR707
+            { "45", "86" }, //PR708a
             { "41", "87" }, //PR708b
+            { "82", "7" }, //Scari_1
+            { "83", "8" }, //Scari_2
+            { "84", "9" }, //Scari_Mici
+            { "85", "10" }, //Lift
+            { "86", "11" }, //Iesire_1
+            { "87", "12" }, //Iesire_2
         };
 
         public SQLServerController() {
@@ -183,7 +189,7 @@ namespace WebApplication1.Controllers
                         string[] pathIds = reader.GetString(1).Split(',');
                         string[] pathNames = reader.GetString(2).Split(',');
                         for (int i = 0; i < pathIds.Length; i++)
-                            traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + pathIds[i] + "},";
+                            traseu += "{\"nume\": \"" + pathNames[i] + "\", \"id\": " + sqlServerIdDict.FirstOrDefault(x => x.Value == pathIds[i]).Key + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
 
                         //Calcul memorie
@@ -207,7 +213,7 @@ namespace WebApplication1.Controllers
                         "}";
                         traseu += "], \"DateRulare\": " + dateRulare + " }";
 
-                        loggySQL.LogInformation(dateRulare + ", ");
+                        loggySQL.LogInformation(dateRulare);
                     }
                     else traseu = "0";
 
