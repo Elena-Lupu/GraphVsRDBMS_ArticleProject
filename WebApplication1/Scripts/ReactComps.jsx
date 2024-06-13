@@ -113,7 +113,10 @@ export class ListaDropDowns extends React.Component {
 class SearchBar extends React.Component {
     render() {
         return (
-            <div style={{ width: "40%" }}><input className="selectorStyle" placeholder="Cauta..." style={{ width: "50%" }} /></div>
+            <div style={{ width: "40%" }}>
+                <input className="selectorStyle" placeholder="Cauta..." style={{ width: "50%" }} />
+                <ButonIco svg="cauta" />
+            </div>
         );
     }
 }

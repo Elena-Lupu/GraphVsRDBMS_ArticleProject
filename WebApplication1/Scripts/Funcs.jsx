@@ -365,14 +365,26 @@ function etajPunct(punct, etaj) {
 }
 
 function colorHarta(x, y, radius, culoare) {
+    let ang = 0;
+    ang = Math.atan2(y - posY, x - posX);
+
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fillStyle = culoare;
     ctx.fill();
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#003300';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#ac7900';
     ctx.moveTo(posX, posY);
-    if (posX != 0) ctx.lineTo(x, y);
+    if (posX != 0) {
+        ctx.lineTo(x, y);
+        ctx.lineTo(x - 15 * Math.cos(ang - Math.PI / 6), y - 15 * Math.sin(ang - Math.PI / 6));
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 15 * Math.cos(ang + Math.PI / 6), y - 15 * Math.sin(ang + Math.PI / 6));
+    }
     posX = x;
     posY = y;
     ctx.stroke();

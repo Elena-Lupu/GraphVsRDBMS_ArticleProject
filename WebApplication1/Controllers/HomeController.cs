@@ -28,23 +28,30 @@ namespace WebApplication1.Controllers
 
             //SQL Server
             log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
-            lines = System.IO.File.ReadLines(log);
-            foreach (var line in lines) {
-                jsonLine = JObject.Parse(line);
-                ja.Add(jsonLine);
-            }
+            try
+            {
+                lines = System.IO.File.ReadLines(log);
+                foreach (var line in lines) {
+                    jsonLine = JObject.Parse(line);
+                    ja.Add(jsonLine);
+                }
+            }catch (Exception ex) { Console.WriteLine(ex); }
 
             result["SQLServer"] = ja;
 
             //Neo4j
             ja = new JArray();
             log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
-            lines = System.IO.File.ReadLines(log);
-            foreach (var line in lines)
+            try
             {
-                jsonLine = JObject.Parse(line);
-                ja.Add(jsonLine);
+                lines = System.IO.File.ReadLines(log);
+                foreach (var line in lines)
+                {
+                    jsonLine = JObject.Parse(line);
+                    ja.Add(jsonLine);
+                }
             }
+            catch (Exception ex) { Console.WriteLine(ex); }
 
             result["Neo"] = ja;
 

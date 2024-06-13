@@ -137,7 +137,7 @@ namespace WebApplication1.Controllers
         public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string idStart, idEnd, traseu = "", dateRulare;
-            string[] puncteEvitateList, puncteIntermediareList = null;
+            string[] puncteEvitateList, puncteIntermediareList = { };
             int lenVia;
             float ram;
             double cpu;
