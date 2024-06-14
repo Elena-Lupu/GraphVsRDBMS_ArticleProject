@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading;
 using Neo4j.Driver;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace WebApplication1.Controllers
 {
@@ -129,14 +131,14 @@ namespace WebApplication1.Controllers
                 logging.SetMinimumLevel(LogLevel.Trace);
                 logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
             });
-
             loggySQL = factory.CreateLogger("SQL_Logs");
+
             sw = new Stopwatch();
         }
 
-        public string CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
+        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
-            string idStart, idEnd, traseu = "", dateRulare;
+            string idStart, idEnd, traseu = "", dateRulare = "";
             string[] puncteEvitateList, puncteIntermediareList = { };
             int lenVia;
             float ram;
@@ -220,13 +222,12 @@ namespace WebApplication1.Controllers
 
                     reader.Close();
                 }
-
             } catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
 
-            return traseu;
+            return await Task.FromResult(traseu);
         }
 
         void IDisposable.Dispose()

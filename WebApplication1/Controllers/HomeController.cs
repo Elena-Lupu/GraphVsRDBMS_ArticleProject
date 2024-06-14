@@ -21,7 +21,7 @@ namespace WebApplication1.Controllers
         public string GetStats()
         {
             JObject result = new JObject();
-            JObject jsonLine;
+            JObject jsonLine = new JObject(); ;
             JArray ja = new JArray();
             string log;
             IEnumerable<string> lines;
@@ -32,7 +32,7 @@ namespace WebApplication1.Controllers
             {
                 lines = System.IO.File.ReadLines(log);
                 foreach (var line in lines) {
-                    jsonLine = JObject.Parse(line);
+                    if (line != null && line != "") jsonLine = JObject.Parse(line);
                     ja.Add(jsonLine);
                 }
             }catch (Exception ex) { Console.WriteLine(ex); }
@@ -47,7 +47,7 @@ namespace WebApplication1.Controllers
                 lines = System.IO.File.ReadLines(log);
                 foreach (var line in lines)
                 {
-                    jsonLine = JObject.Parse(line);
+                    if (line != null && line != "") jsonLine = JObject.Parse(line);
                     ja.Add(jsonLine);
                 }
             }
