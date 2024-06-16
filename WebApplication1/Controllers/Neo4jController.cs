@@ -270,6 +270,7 @@ namespace WebApplication1.Controllers
                             for (int j = 0; j < lenVia - 1; j++)
                                 puncteIntermediareList[j] = puncteIntermediareList[j + 1];
                             puncteIntermediareList[lenVia - 1] = traseuTemp;
+                            traseuTemp = "{\"Traseu\": [";
                         }
                     }
 
@@ -308,6 +309,7 @@ namespace WebApplication1.Controllers
                 });
             } catch (Exception ex) {
                 Console.WriteLine(ex);
+                traseu = ex.ToString();
             }
             
             return traseu;
