@@ -126,7 +126,7 @@ namespace WebApplication1.Controllers
         [Obsolete]
         public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
-            string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "", dateRulare = "";
+            string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "", dateRulare = "", pondere="0";
             string[] puncteEvitateList = { }, puncteIntermediareList = { };
             int lenVia = 0;
             float ram = 0;
@@ -163,26 +163,26 @@ namespace WebApplication1.Controllers
                 //hartaCompleta este graful complet
                 //hartaFaraScari este graful fara nodurile de tip scari
                 //La ambele se poate concatena un sir de nr = punctele ce se doresc evitate
+                
+                //Verifica daca este proiectat in memorie o harta corespunzatoare
+                checkCypher += "CALL apoc.when(NOT gds.graph.exists(\"" + harta + "\"), \"MATCH (n)-[r]->(m) ";
+                if (filtruScari || puncteEvitate != "") checkCypher += "WHERE ";
+                if (filtruScari) checkCypher += "(NOT n:scari) AND (NOT m:scari) ";
+                if (puncteEvitate != "")
+                {
+                    if (filtruScari) checkCypher += "AND ";
+
+                    checkCypher += "NOT id(n) IN [";
+                    foreach (string pel in puncteEvitateList) checkCypher += "toInteger(" + pel + "), ";
+                    checkCypher = checkCypher.Substring(0, checkCypher.Length - 2);
+                    checkCypher += "] ";
+                }
+                checkCypher += "WITH gds.graph.project('" + harta + "', n, m, { relationshipProperties: r { .pondere } }) AS graf" + harta + " RETURN 'ok'\")";
 
                 var ses = neoDriver.AsyncSession();
-                var res = await ses.ExecuteWriteAsync(async tx =>
+                var res = await ses.ExecuteReadAsync(async tx =>
                 {
                     sw.Start();
-
-                    //Verifica daca este proiectat in memorie o harta corespunzatoare
-                    checkCypher += "CALL apoc.when(NOT gds.graph.exists(\"" + harta + "\"), \"MATCH (n)-[r]->(m) ";
-                    if (filtruScari || puncteEvitate != "") checkCypher += "WHERE ";
-                    if (filtruScari) checkCypher += "(NOT n:scari) AND (NOT m:scari) ";
-                    if (puncteEvitate != "")
-                    {
-                        if (filtruScari) checkCypher += "AND ";
-
-                        checkCypher += "NOT id(n) IN [";
-                        foreach (string pel in puncteEvitateList) checkCypher += "toInteger(" + pel + "), ";
-                        checkCypher = checkCypher.Substring(0, checkCypher.Length - 2);
-                        checkCypher += "] ";
-                    }
-                    checkCypher += "WITH gds.graph.project('" + harta + "', n, m, { relationshipProperties: r { .pondere } }) AS graf" + harta + " RETURN 'ok'\")";
 
                     await tx.RunAsync(checkCypher);
 
@@ -200,7 +200,8 @@ namespace WebApplication1.Controllers
                         var record = await result.SingleAsync();
 
                         //Formateaza JSON-ul care contine traseul complet + costul + alte detalii
-                        traseu = "{ \"Pondere\": " + record[1].As<string>() + ", \"Traseu\": [";
+                        pondere = record[1].As<string>();
+                        traseu = "{ \"Pondere\": " + pondere + ", \"Traseu\": [";
                         foreach (var node in record[0].As<List<INode>>())
                             traseu += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
                         traseu = traseu.Substring(0, traseu.Length - 1);
@@ -256,7 +257,8 @@ namespace WebApplication1.Controllers
                                 traseuTemp += "{\"nume\": \"" + node.Properties["name"].ToString() + "\", \"id\": " + neoIdDict.FirstOrDefault(x => x.Value == node.Id.ToString()).Key + "},";
 
                             traseuTemp = traseuTemp.Substring(0, traseuTemp.Length - 1);
-                            traseuTemp += "], \"Pondere\": " + costTemp.ToString() + ", ";
+                            pondere = costTemp.ToString();
+                            traseuTemp += "], \"Pondere\": " + pondere + ", ";
 
                             //Compara costul total al traseului cu ultimul salvat si retine traseul JSON + costul daca este mai mic
                             if (costTemp < costTraseuVia)
@@ -279,35 +281,36 @@ namespace WebApplication1.Controllers
                         await tx.RunAsync("CALL gds.graph.drop('" + harta + "')");
 
                     sw.Stop();
-
-                    //Calcul memorie
-                    ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
-
-                    //Calcul CPU
-                    PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
-                    double timpTotal = 0.0;
-                    Process[] proceseleInteres = Process.GetProcessesByName("Neo4j Desktop");
-                    cpuIdlePC.NextValue();
-                    foreach (Process proc in proceseleInteres)
-                        timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
-                    Thread.Sleep(1500);
-                    cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue() / timpTotal;
-
-                    dateRulare = "{ " +
-                        "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
-                        "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
-                        "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
-                        "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
-                        "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
-                    "}";
-
-                    traseu += "\"DateRulare\": " + dateRulare + "}";
-
-                    loggyNeo4j.LogInformation(dateRulare);
-
                     return traseu;
                 });
-            } catch (Exception ex) {
+
+                //Calcul memorie
+                ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
+
+                //Calcul CPU
+                PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
+                double timpTotal = 0.0;
+                Process[] proceseleInteres = Process.GetProcessesByName("Neo4j Desktop");
+                cpuIdlePC.NextValue();
+                foreach (Process proc in proceseleInteres)
+                    timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
+                Thread.Sleep(1500);
+                cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue()/ timpTotal;
+
+                dateRulare = "{ " +
+                    "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                    "\"Pondere\": \"" + pondere + "\", " +
+                    "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
+                    "\"NrPuncteEvitate\": \"" + puncteEvitateList.Length.ToString() + "\", " +
+                    "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
+                    "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
+                    "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
+                "}";
+
+                traseu += "\"DateRulare\": " + dateRulare + "}";
+                loggyNeo4j.LogInformation(dateRulare);
+            }
+            catch (Exception ex) {
                 Console.WriteLine(ex);
                 traseu = ex.ToString();
             }

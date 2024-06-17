@@ -19,7 +19,9 @@ class Tabel extends React.Component {
                     <thead>
                         <tr>
                             <th>TimeStamp</th>
+                            <th>Pondere</th>
                             <th>Nr. puncte intermediare</th>
+                            <th>Nr. puncte evitate</th>
                             <th>Timp executie (ms)</th>
                             <th>Memorie utilizata (MB)</th>
                             <th>CPU (%)</th>
@@ -31,7 +33,9 @@ class Tabel extends React.Component {
                                 return (
                                     <tr>
                                         <td>{item.DateTime}</td>
+                                        <td>{item.Pondere}</td>
                                         <td>{item.NrPuncteIntermediare}</td>
+                                        <td>{item.NrPuncteEvitate}</td>
                                         <td>{item.TimpExecutie_ms}</td>
                                         <td>{item.MemorieUtilizata_MB}</td>
                                         <td>{item.CPU_Pr}</td>

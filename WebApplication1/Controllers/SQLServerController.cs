@@ -139,7 +139,7 @@ namespace WebApplication1.Controllers
         public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string idStart, idEnd, traseu = "", dateRulare = "";
-            string[] puncteEvitateList, puncteIntermediareList = { };
+            string[] puncteEvitateList = { }, puncteIntermediareList = { };
             int lenVia;
             float ram;
             double cpu;
@@ -209,7 +209,9 @@ namespace WebApplication1.Controllers
 
                         dateRulare = "{ " +
                             "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                            "\"Pondere\": \"" + reader.GetInt32(0) + "\", " +
                             "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
+                            "\"NrPuncteEvitate\": \"" + puncteEvitateList.Length.ToString() + "\", " +
                             "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
                             "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
                             "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +

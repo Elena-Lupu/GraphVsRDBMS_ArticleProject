@@ -175,7 +175,9 @@ export function cauta() {
 
                 detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timestamp:  " + traseu.DateRulare.DateTime} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Pondere:  " + traseu.DateRulare.Pondere} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Nr de puncte intermediare:  " + traseu.DateRulare.NrPuncteIntermediare} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Nr de puncte evitate:  " + traseu.DateRulare.NrPuncteEvitate} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timp de calcul:  " + traseu.DateRulare.TimpExecutie_ms + " ms"} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + traseu.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> CPU:  " + traseu.DateRulare.CPU_Pr + " %"} marime="TextSelect" />);
