@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="TestSQL">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+    </TestPlan>
+    <hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Rezultate">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="NisteUseri">
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+        <intProp name="ThreadGroup.num_threads">100</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <longProp name="ThreadGroup.duration">1</longProp>
+        <longProp name="ThreadGroup.delay">1</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="CalculeazaTraseuSQL">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">51727</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/SQLServer/CalculeazaTraseu</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="punctPlecare" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${punctPlecareVar}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">punctPlecare</stringProp>
+              </elementProp>
+              <elementProp name="punctDestinatie" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${punctDestinatieVar}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">punctDestinatie</stringProp>
+              </elementProp>
+              <elementProp name="filtruScari" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">true</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">filtruScari</stringProp>
+              </elementProp>
+              <elementProp name="puncteEvitate" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${punctEvitat1Var},${punctEvitat2Var}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">puncteEvitate</stringProp>
+              </elementProp>
+              <elementProp name="puncteIntermediare" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">puncteIntermediare</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctPlecare">
+        <stringProp name="variableName">punctPlecareVar</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctInter3" enabled="true">
+        <stringProp name="variableName">punctInter3Var</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctInter2" enabled="true">
+        <stringProp name="variableName">punctInter2Var</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctInter1" enabled="true">
+        <stringProp name="variableName">punctInter1Var</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctEvitat2" enabled="true">
+        <stringProp name="variableName">punctEvitat2Var</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctEvitat1" enabled="true">
+        <stringProp name="variableName">punctEvitat1Var</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="PunctDestinatie" enabled="true">
+        <stringProp name="variableName">punctDestinatieVar</stringProp>
+        <stringProp name="outputFormat">0</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="maximumValue">70</stringProp>
+        <stringProp name="randomSeed"></stringProp>
+        <boolProp name="perThread">true</boolProp>
+      </RandomVariableConfig>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
