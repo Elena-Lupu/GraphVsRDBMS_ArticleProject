@@ -106,8 +106,9 @@ export function cauta() {
     let puncteIntermediare = [];
 
     switch (bd) {
-        case '1': bdController = "Neo4j"; break;
-        case '2': bdController = "SQLServer"; break;
+        case '1':
+        case '2': bdController = "Neo4j"; break;
+        case '3': bdController = "SQLServer"; break;
         default: alert("Alege serios !!!"); return;
     }
 
@@ -154,6 +155,7 @@ export function cauta() {
     params.append("filtruScari", filtruScari);
     params.append("puncteEvitate", puncteEvitate);
     params.append("puncteIntermediare", puncteIntermediare);
+    if (bdController == "Neo4j") params.append("aura", bd == 1 ? false : true);
 
     let options = {
         method: "POST",
@@ -173,16 +175,18 @@ export function cauta() {
                         chestii.push(<Text text={traseu.Traseu[i - 1].nume + " ---> " + traseu.Traseu[i].nume} marime="TextSelect" />);
                 chestii.push(<Text text={"FINISH:   " + traseu.Traseu[len - 1].nume} marime="TextSelect" />);
 
-                detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController + (bd == 1 ? "  (Local)" : "  (AuraDB)")} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timestamp:  " + traseu.DateRulare.DateTime} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Pondere:  " + traseu.DateRulare.Pondere} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Nr de puncte intermediare:  " + traseu.DateRulare.NrPuncteIntermediare} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Nr de puncte evitate:  " + traseu.DateRulare.NrPuncteEvitate} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timp de calcul:  " + traseu.DateRulare.TimpExecutie_ms + " ms"} marime="TextSelect" />);
-                detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + traseu.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
-                detaliiRulare.push(<Text text={"--> CPU:  " + traseu.DateRulare.CPU_Pr + " %"} marime="TextSelect" />);
-
-            } catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
+                if (bd != 2) {
+                    detaliiRulare.push(<Text text={"--> Memorie utilizata de BD:  " + traseu.DateRulare.MemorieUtilizata_MB + " MB"} marime="TextSelect" />);
+                    detaliiRulare.push(<Text text={"--> CPU:  " + traseu.DateRulare.CPU_Pr + " %"} marime="TextSelect" />);
+                }
+            }
+            catch { chestii = <Text text="Nu exista traseu !!" marime="TextSelect" />; }
             ReactDOM.render(chestii, document.getElementById('detaliiDiv'));
             ReactDOM.render(detaliiRulare, document.getElementById('detaliiRulareDiv'));
             punePunctePeHarta();
@@ -201,42 +205,59 @@ export function DeschideStatistica() {
             jsonVector = JSON.parse(data);
             ReactDOM.render(<PaginaStats
                 nrSQL={jsonVector.SQLServer.length}
-                nrNeo={jsonVector.Neo.length}
+                nrNeoLocal={jsonVector.NeoLocal.length}
+                nrNeoAura={jsonVector.NeoAura.length}
                 dataSQL={jsonVector.SQLServer}
-                dataNeo={jsonVector.Neo}
+                dataNeoLocal={jsonVector.NeoLocal}
+                dataNeoAura={jsonVector.NeoAura}
             />, document.getElementById('unDiv'))
 
             //SQL Server
-            jsonVector.SQLServer.forEach((el) => {
-                xVector.push(el.DateTime);
-                yVector.push(parseInt(el.TimpExecutie_ms));
-            });
-            deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_SQL");
+            if (jsonVector.SQLServer != "") {
+                jsonVector.SQLServer.forEach((el) => {
+                    xVector.push(el.DateTime);
+                    yVector.push(parseInt(el.TimpExecutie_ms));
+                });
+                deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_SQL");
 
-            yVector = [];
-            jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.MemorieUtilizata_MB).replaceAll(',', '.'))));
-            deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_SQL");
+                yVector = [];
+                jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.MemorieUtilizata_MB).replaceAll(',', '.'))));
+                deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_SQL");
 
-            yVector = [];
-            jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.CPU_Pr).replaceAll(',', '.'))));
-            deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_SQL");
+                yVector = [];
+                jsonVector.SQLServer.forEach((el) => yVector.push(parseFloat((el.CPU_Pr).replaceAll(',', '.'))));
+                deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_SQL");
+            }
 
-            //Neo4j
-            xVector = [];
-            yVector = [];
-            jsonVector.Neo.forEach((el) => {
-                xVector.push(el.DateTime);
-                yVector.push(parseInt(el.TimpExecutie_ms));
-            });
-            deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_Neo");
+            //Neo4jLocal
+            if (jsonVector.NeoLocal != "") {
+                xVector = [];
+                yVector = [];
+                jsonVector.NeoLocal.forEach((el) => {
+                    xVector.push(el.DateTime);
+                    yVector.push(parseInt(el.TimpExecutie_ms));
+                });
+                deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_NeoLocal");
 
-            yVector = [];
-            jsonVector.Neo.forEach((el) => yVector.push(parseFloat(el.MemorieUtilizata_MB)));
-            deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_Neo");
+                yVector = [];
+                jsonVector.NeoLocal.forEach((el) => yVector.push(parseFloat(el.MemorieUtilizata_MB)));
+                deseneazaGrafic("Memorie utilizata (MB)", xVector, yVector, "Plot_Mem_Neo");
 
-            yVector = [];
-            jsonVector.Neo.forEach((el) => yVector.push(parseFloat(el.CPU_Pr)));
-            deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_Neo");
+                yVector = [];
+                jsonVector.NeoLocal.forEach((el) => yVector.push(parseFloat(el.CPU_Pr)));
+                deseneazaGrafic("CPU (%)", xVector, yVector, "Plot_CPU_Neo");
+            }
+
+            //Neo4jAura
+            if (jsonVector.NeoAura != "") {
+                xVector = [];
+                yVector = [];
+                jsonVector.NeoAura.forEach((el) => {
+                    xVector.push(el.DateTime);
+                    yVector.push(parseInt(el.TimpExecutie_ms));
+                });
+                deseneazaGrafic("Timpi de executie (ms)", xVector, yVector, "Plot_Timpi_NeoAura");
+            }
         })
         .catch(error => console.log(error));
 }

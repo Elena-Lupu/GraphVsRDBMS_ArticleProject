@@ -35,12 +35,16 @@
 
 export var BdData = [
     {
-        "nume": "Neo4j",
+        "nume": "Neo4j (Local)",
         "id": "1"
     },
     {
-        "nume": "MSSQL Server",
+        "nume": "Neo4j (AuraDB)",
         "id": "2"
+    },
+    {
+        "nume": "MSSQL Server",
+        "id": "3"
     }
 ];
 

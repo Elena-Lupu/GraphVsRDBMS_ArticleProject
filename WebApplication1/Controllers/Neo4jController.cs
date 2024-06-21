@@ -16,8 +16,10 @@ namespace WebApplication1.Controllers
     public class Neo4jController : Controller, IDisposable
     {
         private readonly Stopwatch sw = null;
-        private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4j;
-        private readonly IDriver neoDriver;
+        private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4jLocal;
+        private readonly Microsoft.Extensions.Logging.ILogger loggyNeo4jAura;
+        private readonly IDriver neoDriverLocal;
+        private readonly IDriver neoDriverAura;
         private readonly Dictionary<string, string> neoIdDict = new Dictionary<string, string>() // Key = LocalID, Value = NeoID
         {
             { "1", "12" }, //PR001
@@ -111,20 +113,27 @@ namespace WebApplication1.Controllers
 
         public Neo4jController()
         {
-            neoDriver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "GrafuriVesele"));
+            neoDriverLocal = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "GrafuriVesele"));
+            neoDriverAura = GraphDatabase.Driver("neo4j+s://17a9c69d.databases.neo4j.io", AuthTokens.Basic("neo4j", "9GSC0BlBtfQZvpeMzct_U4O1AKtywsQBPyozr6l5eSw"));
 
-            var factory = LoggerFactory.Create(logging =>
+            var factoryLocal = LoggerFactory.Create(logging =>
             {
                 logging.SetMinimumLevel(LogLevel.Trace);
-                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
+                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jLocal\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
+            });
+            var factoryAura = LoggerFactory.Create(logging =>
+            {
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddZLoggerFile("E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jAura\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log");
             });
 
-            loggyNeo4j = factory.CreateLogger("Neo4j_Logs");
+            loggyNeo4jLocal = factoryLocal.CreateLogger("Neo4j_Logs_Local");
+            loggyNeo4jAura = factoryAura.CreateLogger("Neo4j_Logs_Aura");
             sw = new Stopwatch();
         }
 
         [Obsolete]
-        public async Task<string> CalculeazaTraseu(string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
+        public async Task<string> CalculeazaTraseu(bool aura, string punctPlecare, string punctDestinatie, bool filtruScari, string puncteEvitate = "", string puncteIntermediare = "")
         {
             string traseu = "", idStart = "", idEnd = "", harta = "", checkCypher = "", dateRulare = "", pondere="0";
             string[] puncteEvitateList = { }, puncteIntermediareList = { };
@@ -179,7 +188,7 @@ namespace WebApplication1.Controllers
                 }
                 checkCypher += "WITH gds.graph.project('" + harta + "', n, m, { relationshipProperties: r { .pondere } }) AS graf" + harta + " RETURN 'ok'\")";
 
-                var ses = neoDriver.AsyncSession();
+                var ses = aura ? neoDriverAura.AsyncSession() : neoDriverLocal.AsyncSession();
                 var res = await ses.ExecuteReadAsync(async tx =>
                 {
                     sw.Start();
@@ -284,31 +293,44 @@ namespace WebApplication1.Controllers
                     return traseu;
                 });
 
-                //Calcul memorie
-                ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
+                if (!aura)
+                {
+                    //Calcul memorie
+                    ram = new PerformanceCounter("Process", "Working Set - Private", "Neo4j Desktop").NextValue() / (1024 * 1024);
 
-                //Calcul CPU
-                PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
-                double timpTotal = 0.0;
-                Process[] proceseleInteres = Process.GetProcessesByName("Neo4j Desktop");
-                cpuIdlePC.NextValue();
-                foreach (Process proc in proceseleInteres)
-                    timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
-                Thread.Sleep(1500);
-                cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue()/ timpTotal;
+                    //Calcul CPU
+                    PerformanceCounter cpuIdlePC = new PerformanceCounter("Process", "% Processor Time", "_Total");
+                    double timpTotal = 0.0;
+                    Process[] proceseleInteres = Process.GetProcessesByName("Neo4j Desktop");
+                    cpuIdlePC.NextValue();
+                    foreach (Process proc in proceseleInteres)
+                        timpTotal += proc.TotalProcessorTime.TotalMilliseconds;
+                    Thread.Sleep(1500);
+                    cpu = sw.ElapsedMilliseconds * cpuIdlePC.NextValue() / timpTotal;
 
-                dateRulare = "{ " +
-                    "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
-                    "\"Pondere\": \"" + pondere + "\", " +
-                    "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
-                    "\"NrPuncteEvitate\": \"" + puncteEvitateList.Length.ToString() + "\", " +
-                    "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
-                    "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
-                    "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
-                "}";
+                    dateRulare = "{ " +
+                        "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                        "\"Pondere\": \"" + pondere + "\", " +
+                        "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
+                        "\"NrPuncteEvitate\": \"" + puncteEvitateList.Length.ToString() + "\", " +
+                        "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\", " +
+                        "\"MemorieUtilizata_MB\": \"" + ram.ToString() + "\", " +
+                        "\"CPU_Pr\": \"" + cpu.ToString() + "\" " +
+                    "}";
+                }
+                else
+                    dateRulare = "{ " + 
+                        "\"DateTime\": \"" + DateTime.Now.ToString("dd-MM-yyyy HH:mm") + "\", " +
+                        "\"Pondere\": \"" + pondere + "\", " +
+                        "\"NrPuncteIntermediare\": \"" + puncteIntermediareList.Length.ToString() + "\", " +
+                        "\"NrPuncteEvitate\": \"" + puncteEvitateList.Length.ToString() + "\", " +
+                        "\"TimpExecutie_ms\": \"" + sw.ElapsedMilliseconds.ToString() + "\"" +
+                    "}";
+
 
                 traseu += "\"DateRulare\": " + dateRulare + "}";
-                loggyNeo4j.LogInformation(dateRulare);
+                if (aura) loggyNeo4jAura.LogInformation(dateRulare);
+                else loggyNeo4jLocal.LogInformation(dateRulare);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex);
@@ -320,7 +342,8 @@ namespace WebApplication1.Controllers
 
         void IDisposable.Dispose()
         {
-            neoDriver?.Dispose();
+            neoDriverLocal?.Dispose();
+            neoDriverAura?.Dispose();
         }
     }
 }

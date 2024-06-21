@@ -39,20 +39,24 @@ namespace WebApplication1.Controllers
                         catch { continue; }
                     ja.Add(jsonLine);
                 }
+                
+                result["SQLServer"] = ja;
             }
             catch (IOException)
             {
-                System.IO.File.Copy(log, "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log", true);
-                log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log";
-                goto citireaSQL;
+                try {
+                    System.IO.File.Copy(log, "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log", true);
+                    log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\SQLServer\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log";
+                    goto citireaSQL;
+                }
+                catch { result["SQLServer"] = ""; }
             }
             catch (Exception ex) { Console.WriteLine(ex); }
 
-            result["SQLServer"] = ja;
 
-            //Neo4j
+            //Neo4jLocal
             ja = new JArray();
-            log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
+            log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jLocal\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
             citireaNeo:
             try
             {
@@ -64,16 +68,48 @@ namespace WebApplication1.Controllers
                         catch { continue; }
                     ja.Add(jsonLine);
                 }
+                
+                result["NeoLocal"] = ja;
             }
             catch (IOException)
             {
-                System.IO.File.Copy(log, "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log", true);
-                log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4j\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log";
-                goto citireaNeo;
+                try {
+                    System.IO.File.Copy(log, "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jLocal\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log", true);
+                    log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jLocal\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log";
+                    goto citireaNeo;
+                }
+                catch { result["NeoLocal"] = ""; }
             }
             catch (Exception ex) { Console.WriteLine(ex); }
 
-            result["Neo"] = ja;
+            //Neo4jAura
+            ja = new JArray();
+            log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jAura\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
+            citireaNeoAura:
+            try
+            {
+                lines = System.IO.File.ReadLines(log);
+                foreach (var line in lines)
+                {
+                    if (line != null && line != "")
+                        try { jsonLine = JObject.Parse(line); }
+                        catch { continue; }
+                    ja.Add(jsonLine);
+                }
+
+                result["NeoAura"] = ja;
+            }
+            catch (IOException)
+            {
+                try
+                {
+                    System.IO.File.Copy(log, "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jAura\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log", true);
+                    log = "E:\\Licenta\\PrecisNav\\WebApplication1\\Logs\\Neo4jAura\\log_" + DateTime.Now.ToString("dd-MM-yyyy") + "-Copie.log";
+                    goto citireaNeoAura;
+                }
+                catch { result["NeoAura"] = ""; }
+            }
+            catch (Exception ex) { Console.WriteLine(ex); }
 
             return result.ToString();
         }

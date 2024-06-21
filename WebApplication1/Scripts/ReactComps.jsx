@@ -29,19 +29,20 @@ class Tabel extends React.Component {
                     </thead>
                     <tbody>
                         {
-                            this.props.data.map((item) => {
-                                return (
-                                    <tr>
-                                        <td>{item.DateTime}</td>
-                                        <td>{item.Pondere}</td>
-                                        <td>{item.NrPuncteIntermediare}</td>
-                                        <td>{item.NrPuncteEvitate}</td>
-                                        <td>{item.TimpExecutie_ms}</td>
-                                        <td>{item.MemorieUtilizata_MB}</td>
-                                        <td>{item.CPU_Pr}</td>
-                                    </tr>
-                                );
-                            })
+                            this.props.data != "" &&
+                                this.props.data.map((item) => {
+                                    return (
+                                        <tr>
+                                            <td>{item.DateTime}</td>
+                                            <td>{item.Pondere}</td>
+                                            <td>{item.NrPuncteIntermediare}</td>
+                                            <td>{item.NrPuncteEvitate}</td>
+                                            <td>{item.TimpExecutie_ms}</td>
+                                            <td>{item.MemorieUtilizata_MB == null ? "-" : item.MemorieUtilizata_MB}</td>
+                                            <td>{item.CPU_Pr == null ? "-" : item.CPU_Pr}</td>
+                                        </tr>
+                                    );
+                                })
                         }
                     </tbody>
                 </table>
@@ -269,13 +270,24 @@ export class PaginaStats extends React.Component {
                 <br />
                 <br />
 
-                <Text text="Neo4j" marime="TextSubtitlu" />
-                <Text text={"Astazi au fost procesate cu succes " + this.props.nrNeo + " cereri catre server:"} marime="TextSelect" />
-                <Tabel data={this.props.dataNeo} />
+                <Text text="Neo4j  (Local)" marime="TextSubtitlu" />
+                <Text text={"Astazi au fost procesate cu succes " + this.props.nrNeoLocal + " cereri catre server:"} marime="TextSelect" />
+                <Tabel data={this.props.dataNeoLocal} />
                 <div style={{ display: "flex" }}>
-                    <div id="Plot_Timpi_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
+                    <div id="Plot_Timpi_NeoLocal" style={{ width: "20%", paddingRight: "12%" }}></div>
                     <div id="Plot_Mem_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
                     <div id="Plot_CPU_Neo" style={{ width: "20%", paddingRight: "12%" }}></div>
+                </div>
+
+                <br />
+                <br />
+
+                <Text text="Neo4j  (AuraDB)" marime="TextSubtitlu" />
+                <Text text="Restul de metrici sunt disponibili pe AuraDB. Aici se va afisa doar timpul de executie" marime="TextSelect" />
+                <Text text={"Astazi au fost procesate cu succes " + this.props.nrNeoAura + " cereri catre server:"} marime="TextSelect" />
+                <Tabel data={this.props.dataNeoAura} />
+                <div style={{ display: "flex" }}>
+                    <div id="Plot_Timpi_NeoAura" style={{ width: "20%", paddingRight: "12%" }}></div>
                 </div>
             </div>
         );
