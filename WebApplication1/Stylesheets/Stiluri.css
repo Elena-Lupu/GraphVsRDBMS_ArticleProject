@@ -9,6 +9,26 @@ body {
     margin: 0;
 }
 
+ul {
+    margin-top: 5px;
+    list-style-type: none;
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+li {
+    cursor: pointer;
+}
+
+.stilLista {
+    border: 1px solid #ac7900;
+    border-radius: 10px;
+    background-color: #ffedd6;
+    height: 150px;
+    overflow: scroll;
+}
+
 td {
     border-top: 2px solid #6f6f6f;
     font-size: 16px;

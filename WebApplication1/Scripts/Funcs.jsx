@@ -326,6 +326,23 @@ export function schimbaHarta(etaj = 0) {
     }
 }
 
+export function cautaPuncte() {
+    document.getElementById("listaCautare").style.display = "";
+
+    let input = document.getElementById("baraCautare").value.toUpperCase();
+    let list = document.getElementsByTagName("li");
+    let txtValue;
+
+    for (let i = 0; i < list.length; i++) {
+        txtValue = list[i].textContent || list[i].innerText;
+        if (txtValue.toUpperCase().indexOf(input) > -1) {
+            list[i].style.display = "";
+        } else {
+            list[i].style.display = "none";
+        }
+    }
+}
+
 function deseneazaGrafic(titlu, xVector, yVector, id) {
     let layout = {
         width: parseInt(getComputedStyle(document.getElementById(id)).width) * 1.5,

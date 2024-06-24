@@ -115,12 +115,40 @@ export class ListaDropDowns extends React.Component {
     }
 }
 
+class Lista extends React.Component {
+    addFinishPoint = (nr) => {
+        document.getElementById("listaCautare").style.display = "none";
+        document.getElementById("PunctDestinatie").value = nr;
+    }
+
+    render() {
+        return (
+            <div className="stilLista" id="listaCautare" style={{ display: "none" }}>
+                <ul>
+                    {
+                        this.props.data.map((item) => {
+                            return (
+                                item.points.map((item2) => { return (<li onClick={() => this.addFinishPoint(item2.id)}>{item2.nume}</li>); })
+                            );
+                        })
+                    }
+                </ul>
+            </div>
+        );
+    }
+}
+
 class SearchBar extends React.Component {
     render() {
         return (
-            <div style={{ width: "40%" }}>
-                <input className="selectorStyle" placeholder="Cauta..." style={{ width: "50%" }} />
-                <ButonIco svg="cauta" />
+            <div style={{ width: "40%", display: "flex" }}>
+                <div style={{ width: "50%" }}>
+                    <input id="baraCautare" className="selectorStyle" placeholder="Cauta..." style={{ width: "90%" }} />
+                    <div id="searchResult" style={{ width: "50%" }}>
+                        <Lista data={JSONdata.pointsData} />
+                    </div>
+                </div>
+                <ButonIco svg="cauta" func={funcsData.cautaPuncte} />
             </div>
         );
     }
