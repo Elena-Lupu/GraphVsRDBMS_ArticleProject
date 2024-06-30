@@ -199,6 +199,7 @@ export function DeschideStatistica() {
     let xVector = [];
     let yVector = [];
     document.body.style.backgroundColor = '#000660';
+    document.body.style.overflow = 'auto';
 
     fetch(webPath + "Home/GetStats", { method: "POST" }).then(response => response.text())
         .then(data => {
