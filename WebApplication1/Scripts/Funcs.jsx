@@ -175,7 +175,7 @@ export function cauta() {
                         chestii.push(<Text text={traseu.Traseu[i - 1].nume + " ---> " + traseu.Traseu[i].nume} marime="TextSelect" />);
                 chestii.push(<Text text={"FINISH:   " + traseu.Traseu[len - 1].nume} marime="TextSelect" />);
 
-                detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController + (bd == 1 ? "  (Local)" : "  (AuraDB)")} marime="TextSelect" />);
+                detaliiRulare.push(<Text text={"--> Baza de Date utilizata:  " + bdController + ( bd != 3 ? (bd == 1 ? "  (Local)" : "  (AuraDB)") : "" )} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Timestamp:  " + traseu.DateRulare.DateTime} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Pondere:  " + traseu.DateRulare.Pondere} marime="TextSelect" />);
                 detaliiRulare.push(<Text text={"--> Nr de puncte intermediare:  " + traseu.DateRulare.NrPuncteIntermediare} marime="TextSelect" />);

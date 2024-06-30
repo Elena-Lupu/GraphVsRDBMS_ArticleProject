@@ -206,21 +206,23 @@ class SideBar extends React.Component {
     render() {
         return (
             <div className="BarStyle SideBarStyle">
-                <Text text="Configurarea traseului" marime="TextSubtitlu"/>
-                <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} id="PunctPlecare" />
-                <div style={{ display: "flex" }} id="plusPuncteIntermediare">
-                    <ButonIco svg="plus" func={funcsData.adaugaPuncteIntermediare} />
-                    <Text text="Adauga puncte intermediare" />
+                <div style={{ overflow: "scroll", height: "75%" }}>
+                    <Text text="Configurarea traseului" marime="TextSubtitlu"/>
+                    <DropDown text="Punct plecare" width="90%" data={JSONdata.pointsData} id="PunctPlecare" />
+                    <div style={{ display: "flex" }} id="plusPuncteIntermediare">
+                        <ButonIco svg="plus" func={funcsData.adaugaPuncteIntermediare} />
+                        <Text text="Adauga puncte intermediare" />
+                    </div>
+                    <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} id="PunctDestinatie" />
+                    <ButonText text="Calculeaza Traseul" func={funcsData.cauta} />
+                    <br />
+                    <br />
+                    <Text text="Filtre" marime="TextSubtitlu" />
+                    <CheckBox text="Evita Scarile" id="FiltruScari" />
+                    <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
+                    <div id="ListaPuncteEvitate"></div>
+                    {/*<ButonText text="Teste" func={funcsData.testButon} />*/}
                 </div>
-                <DropDown text="Punct destinatie" width="90%" data={JSONdata.pointsData} id="PunctDestinatie" />
-                <ButonText text="Calculeaza Traseul" func={funcsData.cauta} />
-                <br />
-                <br />
-                <Text text="Filtre" marime="TextSubtitlu" />
-                <CheckBox text="Evita Scarile" id="FiltruScari" />
-                <CheckBox text="Evita ..." id="FiltruPersonalizat" func={funcsData.addPuncteEvitare} />
-                <div id="ListaPuncteEvitate"></div>
-                {/*<ButonText text="Teste" func={funcsData.testButon} />*/}
             </div>
         );
     }
@@ -234,7 +236,7 @@ class DetailBar extends React.Component {
                     <Text text="Detalii traseu" marime="TextSubtitlu" />
                     <div style={{ padding: "15px" }}><ButonIco svg="trash" func={funcsData.clearTraseu} /></div>
                 </div>
-                <div id="detaliiDiv"></div>
+                <div id="detaliiDiv" style={{ overflow: "scroll", height: "65%" }}></div>
             </div>
         );
     }
@@ -249,7 +251,7 @@ class RunDetailsBar extends React.Component {
                     <br />
                     <ButonText text="Statistica" func={funcsData.DeschideStatistica} />
                 </div>
-                <div id="detaliiRulareDiv"></div>
+                <div id="detaliiRulareDiv" style={{ overflow: "scroll" }}></div>
             </div>
         );
     }
